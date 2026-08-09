@@ -4,9 +4,9 @@ import { ConfigPage } from './pages/ConfigPage';
 import { CursoDetallePage } from './pages/CursoDetallePage';
 import { GenerarPage } from './pages/GenerarPage';
 import { FavoritosPage } from './pages/FavoritosPage';
+import { HorarioPage } from './pages/HorarioPage';
 
 // Componentes temporales para evitar errores mientras creas las demás pantallas
-const HorarioPage = () => <div className="p-8">Vista de Horario</div>;
 const EditarHorarioPage = () => <div className="p-8">Editar Horario</div>;
 
 export const App: React.FC = () => {
