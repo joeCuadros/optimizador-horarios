@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
@@ -7,11 +7,18 @@ import { TODOS_LOS_CURSOS, DOCENTES } from '../data/cursos';
 import { useSistemaStorage } from '../hooks/useSistemaStorage';
 import type { Seccion, Docente } from '../types';
 
+interface CeldaPreview {
+  tipo: 'TEO' | 'LAB';
+  seccion: string;
+  esSeleccionado: boolean;
+}
+
 export const CursoDetallePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const cursoId = Number(id);
 
   const [estado, setEstado] = useSistemaStorage();
+  const [modoMatriz, setModoMatriz] = useState<'todos' | 'seleccion'>('todos');
 
   const curso = TODOS_LOS_CURSOS.find((c) => c.id === cursoId);
 
@@ -52,6 +59,49 @@ export const CursoDetallePage: React.FC = () => {
   const isTeoFijada = Boolean(fijadaTeoId && fijadaTeoId === selectedTeoId);
   const isLabFijada = Boolean(fijadaLabId && fijadaLabId === selectedLabId);
 
+  const seccionTeoSeleccionada = seccionesTeoList.find((s) => s.id === selectedTeoId);
+  const seccionLabSeleccionada = seccionesLabList.find((s) => s.id === selectedLabId);
+
+  // Construcción de la matriz semanal completa (todas las secc o solo seleccionadas)
+  const matrizPreview = useMemo(() => {
+    const mapa: Record<number, Record<number, CeldaPreview[]>> = {};
+
+    const registrarBloque = (sec: Seccion, tipo: 'TEO' | 'LAB', esSeleccionado: boolean) => {
+      if (!sec || !sec.lista_horas) return;
+      sec.lista_horas.forEach((h) => {
+        if (!mapa[h.dia_orden]) mapa[h.dia_orden] = {};
+        if (!mapa[h.dia_orden][h.hora_orden]) mapa[h.dia_orden][h.hora_orden] = [];
+        mapa[h.dia_orden][h.hora_orden].push({
+          tipo,
+          seccion: sec.seccion,
+          esSeleccionado,
+        });
+      });
+    };
+
+    if (modoMatriz === 'seleccion') {
+      if (seccionTeoSeleccionada) registrarBloque(seccionTeoSeleccionada, 'TEO', true);
+      if (seccionLabSeleccionada) registrarBloque(seccionLabSeleccionada, 'LAB', true);
+    } else {
+      seccionesTeoList.forEach((sec) =>
+        registrarBloque(sec, 'TEO', sec.id === selectedTeoId)
+      );
+      seccionesLabList.forEach((sec) =>
+        registrarBloque(sec, 'LAB', sec.id === selectedLabId)
+      );
+    }
+
+    return mapa;
+  }, [
+    modoMatriz,
+    seccionTeoSeleccionada,
+    seccionLabSeleccionada,
+    seccionesTeoList,
+    seccionesLabList,
+    selectedTeoId,
+    selectedLabId,
+  ]);
+
   const handleToggleFijarTeo = () => {
     setEstado((prev) => {
       const prevFijadas = prev.secciones_fijadas || {};
@@ -89,14 +139,22 @@ export const CursoDetallePage: React.FC = () => {
   const getNombreDia = (orden: number) => DIAS.find((d) => d.orden === orden)?.nombre || `Día ${orden}`;
   const getNombreHora = (orden: number) => HORAS.find((h) => h.orden === orden)?.nombre || `Bloque ${orden}`;
 
-  // Búsqueda del docente por ID en los datos exportados
   const getDocente = (idDocente: number): Docente | undefined => {
     return DOCENTES.find((d) => d.id === idDocente);
   };
 
   const renderDocenteBadge = (idDocente: number) => {
     const doc = getDocente(idDocente);
-    if (!doc) return <span className="text-slate-400 text-xs italic">Sin docente asignado</span>;
+    if (!doc) {
+      return (
+        <div className="flex items-center gap-2 mt-1">
+          <span className="font-semibold text-slate-800 text-xs">👨‍🏫 No conocido</span>
+          <span className="text-[10px] px-2 py-0.5 rounded-md border font-bold bg-slate-100 text-slate-700 border-slate-300">
+            Neutral (0)
+          </span>
+        </div>
+      );
+    }
 
     const configPeso: Record<number, { label: string; style: string }> = {
       2: { label: 'Muy bueno (+2)', style: 'bg-emerald-100 text-emerald-800 border-emerald-300' },
@@ -135,9 +193,6 @@ export const CursoDetallePage: React.FC = () => {
     );
   };
 
-  const seccionTeoSeleccionada = seccionesTeoList.find((s) => s.id === selectedTeoId);
-  const seccionLabSeleccionada = seccionesLabList.find((s) => s.id === selectedLabId);
-
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Header totalCursosSeleccionados={totalCursos} />
@@ -153,7 +208,7 @@ export const CursoDetallePage: React.FC = () => {
           <div className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex items-center gap-3">
               <span
-                className="text-white text-xs sm:text-sm font-black px-3 py-1.5 rounded-lg shrink-0 shadow-sm"
+                className="text-white text-xs sm:text-sm font-black px-3 py-1.5 rounded-lg shrink-0 shadow-sm font-mono"
                 style={{ backgroundColor: curso.color }}
               >
                 {curso.SIGLAS}
@@ -177,6 +232,120 @@ export const CursoDetallePage: React.FC = () => {
           </div>
         </div>
 
+        {/* VISTA PREVIA MATRIZ SEMANAL COMPLETA (TEOS + LABS) */}
+        <div className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3">
+            <div>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+                🗓️ Vista Previa Gráfica Completa
+              </h2>
+              <p className="text-xs text-slate-500">
+                Compara fácilmente los bloques asignados contra la imagen o silabo oficial.
+              </p>
+            </div>
+
+            {/* TOGGLE DE MODO: TODAS LAS SECCIONES VS SOLO SELECCIÓN */}
+            <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-bold w-full sm:w-auto">
+              <button
+                onClick={() => setModoMatriz('todos')}
+                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-md transition-all ${
+                  modoMatriz === 'todos'
+                    ? 'bg-white text-indigo-600 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Todas las Secciones ({seccionesTeoList.length + seccionesLabList.length})
+              </button>
+              <button
+                onClick={() => setModoMatriz('seleccion')}
+                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-md transition-all ${
+                  modoMatriz === 'seleccion'
+                    ? 'bg-white text-indigo-600 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Solo Selección Actual
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4 text-xs font-bold bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+            <span className="flex items-center gap-1.5 text-indigo-800">
+              <span className="w-3 h-3 rounded bg-indigo-600 inline-block"></span>
+              Secciones Teoría (TEO)
+            </span>
+            <span className="flex items-center gap-1.5 text-emerald-800">
+              <span className="w-3 h-3 rounded bg-emerald-600 inline-block"></span>
+              Secciones Laboratorio (LAB)
+            </span>
+            <span className="text-slate-400 font-normal text-[11px] ml-auto">
+              💡 Las secciones resaltadas con borde grueso corresponden a tu selección actual.
+            </span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse min-w-[700px] text-xs">
+              <thead>
+                <tr className="bg-slate-900 text-white border-b border-slate-800">
+                  <th className="py-2.5 px-2 w-28 text-center font-bold border-r border-slate-800">
+                    Bloque / Hora
+                  </th>
+                  {DIAS.map((dia) => (
+                    <th key={dia.orden} className="py-2.5 px-2 text-center font-bold border-r border-slate-800/50">
+                      {dia.nombre}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {HORAS.map((hora) => (
+                  <tr key={hora.orden} className="border-b border-slate-100 hover:bg-slate-50/50">
+                    <td className="py-1.5 px-2 text-center font-mono font-semibold text-slate-500 bg-slate-50/80 border-r border-slate-200 text-[10px]">
+                      <span className="block font-bold text-slate-800">Bloque {hora.orden}</span>
+                      <span>{hora.nombre}</span>
+                    </td>
+
+                    {DIAS.map((dia) => {
+                      const items = matrizPreview[dia.orden]?.[hora.orden] || [];
+
+                      return (
+                        <td
+                          key={`${dia.orden}-${hora.orden}`}
+                          className="p-1 border-r border-slate-100 align-top min-h-[50px]"
+                        >
+                          {items.length > 0 && (
+                            <div className="flex flex-col gap-1">
+                              {items.map((it, idx) => {
+                                const esTeo = it.tipo === 'TEO';
+                                return (
+                                  <div
+                                    key={idx}
+                                    className={`px-1.5 py-1 rounded text-white font-mono text-[10px] font-bold text-center shadow-sm border ${
+                                      esTeo
+                                        ? it.esSeleccionado
+                                          ? 'bg-indigo-600 border-indigo-900 ring-2 ring-indigo-400'
+                                          : 'bg-indigo-500/85 border-indigo-600'
+                                        : it.esSeleccionado
+                                        ? 'bg-emerald-600 border-emerald-900 ring-2 ring-emerald-400'
+                                        : 'bg-emerald-500/85 border-emerald-600'
+                                    }`}
+                                  >
+                                    {it.tipo} {it.seccion}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* CONTROLES TEORÍA Y LABORATORIO */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
@@ -190,17 +359,16 @@ export const CursoDetallePage: React.FC = () => {
                 Sección de Teoría
               </h2>
               {seccionesTeoList.length > 0 && (
-                <label className="flex items-center gap-2 cursor-pointer select-none bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={isTeoFijada}
-                    onChange={handleToggleFijarTeo}
-                    className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer"
-                  />
-                  <span className={`text-xs font-bold ${isTeoFijada ? 'text-indigo-600' : 'text-slate-600'}`}>
-                    {isTeoFijada ? '📌 Fijada' : 'Fijar esta sección'}
-                  </span>
-                </label>
+                <button
+                  onClick={handleToggleFijarTeo}
+                  className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1.5 rounded-lg border transition-colors ${
+                    isTeoFijada 
+                      ? 'bg-indigo-600 text-white border-indigo-600' 
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                  }`}
+                >
+                  {isTeoFijada ? '📌 Fijada' : '📌 Fijar esta sección'}
+                </button>
               )}
             </div>
 
@@ -253,17 +421,16 @@ export const CursoDetallePage: React.FC = () => {
                 Sección de Laboratorio
               </h2>
               {seccionesLabList.length > 0 && (
-                <label className="flex items-center gap-2 cursor-pointer select-none bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={isLabFijada}
-                    onChange={handleToggleFijarLab}
-                    className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
-                  />
-                  <span className={`text-xs font-bold ${isLabFijada ? 'text-emerald-600' : 'text-slate-600'}`}>
-                    {isLabFijada ? '📌 Fijada' : 'Fijar esta sección'}
-                  </span>
-                </label>
+                <button
+                  onClick={handleToggleFijarLab}
+                  className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1.5 rounded-lg border transition-colors ${
+                    isLabFijada 
+                      ? 'bg-emerald-600 text-white border-emerald-600' 
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                  }`}
+                >
+                  {isLabFijada ? '📌 Fijada' : '📌 Fijar esta sección'}
+                </button>
               )}
             </div>
 
@@ -308,7 +475,7 @@ export const CursoDetallePage: React.FC = () => {
 
         </div>
 
-        {/* CATÁLOGO COMPLETO CON PROFESORES Y CALIFICACIÓN */}
+        {/* CATÁLOGO COMPLETO DE SECCIONES */}
         <div className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <h2 className="text-base font-bold text-slate-800">Catálogo Completo de Secciones</h2>
           

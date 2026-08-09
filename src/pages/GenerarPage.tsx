@@ -114,7 +114,6 @@ export const GenerarPage: React.FC = () => {
     });
 
     const calculados = lista.map((h) => {
-      // 1. Normalizar variables a escala 0-100 pts
       const scoreHueco = maxHueco === minHueco
         ? 100
         : 100 * (1 - (h.horas_hueco - minHueco) / (maxHueco - minHueco));
@@ -127,7 +126,6 @@ export const GenerarPage: React.FC = () => {
         ? 100
         : 100 * ((h.puntaje_docente - minDocente) / (maxDocente - minDocente));
 
-      // 2. Aplicar la fórmula: puntaje_final = (%Hueco * scoreHueco) + (%Comida * scoreComida) + (%Docente * scoreDocente)
       const puntaje_final =
         ((pesoHueco / 100) * scoreHueco) +
         ((pesoComida / 100) * scoreComida) +
@@ -186,6 +184,7 @@ export const GenerarPage: React.FC = () => {
   };
 
   const sumaPesosActual = pesoHueco + pesoComida + pesoDocente;
+  const tieneResultadosAnteriores = (estado.horarios_posibles || []).length > 0;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -209,14 +208,14 @@ export const GenerarPage: React.FC = () => {
             disabled={generando || totalCursosSeleccionados === 0}
             className={`px-6 py-3 rounded-xl font-bold text-sm text-white shadow-md transition-all flex items-center justify-center gap-2 ${
               generando || totalCursosSeleccionados === 0
-                ? 'bg-slate-400 cursor-not-allowed'
+                ? 'bg-indigo-400 cursor-not-allowed'
                 : 'bg-indigo-600 hover:bg-indigo-700 active:scale-95'
             }`}
           >
             {generando ? (
               <>
                 <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
-                <span>Procesando... ({evaluados})</span>
+                <span>Procesando ({evaluados})...</span>
               </>
             ) : (
               <span>🚀 Generar Combinaciones</span>
@@ -224,366 +223,394 @@ export const GenerarPage: React.FC = () => {
           </button>
         </div>
 
-        {/* CÁLCULO EN PROCESO */}
+        {/* INDICADOR FLOTANTE / BANNER DE PROCESAMIENTO (MANTIENE LA VISTA ANTERIOR) */}
         {generando && (
-          <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-8 text-center space-y-3">
-            <div className="inline-block animate-bounce text-3xl">⚙️</div>
-            <h3 className="text-base font-bold text-indigo-900">Evaluando permutaciones con Backtracking...</h3>
-            <p className="text-xs text-indigo-700 max-w-md mx-auto">
-              Probadas: <span className="font-mono font-bold text-indigo-900">{evaluados}</span>
+          <div className="bg-indigo-900 text-white rounded-2xl p-4 sm:p-5 shadow-lg border border-indigo-700 flex flex-col sm:flex-row items-center justify-between gap-4 animate-pulse">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-indigo-800 rounded-xl">
+                <span className="animate-spin inline-block text-xl">⚙️</span>
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-indigo-100">
+                  {tieneResultadosAnteriores
+                    ? 'Actualizando opciones de horarios...'
+                    : 'Evaluando permutaciones con Backtracking...'}
+                </h3>
+                <p className="text-xs text-indigo-300">
+                  Combinaciones analizadas: <span className="font-mono font-bold text-white">{evaluados}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="w-full sm:w-48 bg-indigo-950/80 rounded-full h-2 overflow-hidden border border-indigo-700">
+              <div className="bg-gradient-to-r from-indigo-400 to-emerald-400 h-full w-full animate-subtle-shim"></div>
+            </div>
+          </div>
+        )}
+
+        {/* ESTADO INICIAL SIN RESULTADOS Y CARGANDO POR PRIMERA VEZ */}
+        {generando && !tieneResultadosAnteriores && (
+          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-4 shadow-sm">
+            <div className="inline-block p-4 bg-indigo-50 rounded-full text-indigo-600 animate-bounce">
+              🧩
+            </div>
+            <h3 className="text-base font-bold text-slate-800">
+              Calculando tus mejores alternativas...
+            </h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              Estamos filtrando cruces, optimizando tiempos muertos y clasificando según tus prioridades.
             </p>
           </div>
         )}
 
-        {/* CONTROLES Y PRESETS */}
-        {!generando && estado.horarios_posibles.length > 0 && (
-          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3 gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                    <span>🎛️</span> Personalizar Preferencias de Prioridad
-                  </h2>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    Suma Total: {sumaPesosActual}%
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Los porcentajes siempre suman 100% automáticamente al mover los controles.
-                </p>
-              </div>
-
-              <button
-                onClick={() => setMostrarFormula(!mostrarFormula)}
-                className="text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1"
-              >
-                <span>📐</span> {mostrarFormula ? 'Ocultar Fórmula' : 'Ver Fórmula de Match'}
-              </button>
-            </div>
-
-            {/* PRESETS EXACTOS AL 100% */}
-            <div className="space-y-2">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                Presets Rápidos (Suma 100%):
-              </span>
-              <div className="flex gap-1.5 flex-wrap">
-                <button
-                  onClick={() => { setPesoHueco(100); setPesoComida(0); setPesoDocente(0); }}
-                  className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
-                    pesoHueco === 100 && pesoComida === 0 && pesoDocente === 0
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
-                >
-                  ⏳ Menos Huecos (100% / 0% / 0%)
-                </button>
-
-                <button
-                  onClick={() => { setPesoHueco(0); setPesoComida(0); setPesoDocente(100); }}
-                  className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
-                    pesoHueco === 0 && pesoComida === 0 && pesoDocente === 100
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
-                >
-                  👨‍🏫 Mejores Profes (0% / 0% / 100%)
-                </button>
-
-                <button
-                  onClick={() => { setPesoHueco(0); setPesoComida(100); setPesoDocente(0); }}
-                  className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
-                    pesoHueco === 0 && pesoComida === 100 && pesoDocente === 0
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
-                >
-                  🍱 Hora de Almuerzo (0% / 100% / 0%)
-                </button>
-
-                <button
-                  onClick={() => { setPesoHueco(34); setPesoComida(33); setPesoDocente(33); }}
-                  className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
-                    pesoHueco === 34 && pesoComida === 33 && pesoDocente === 33
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
-                >
-                  ⚖️ Equilibrado (34% / 33% / 33%)
-                </button>
-
-                <button
-                  onClick={() => { setPesoHueco(50); setPesoComida(0); setPesoDocente(50); }}
-                  className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
-                    pesoHueco === 50 && pesoComida === 0 && pesoDocente === 50
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
-                >
-                  🔥 Profe + Sin Huecos (50% / 0% / 50%)
-                </button>
-
-                <button
-                  onClick={() => { setPesoHueco(0); setPesoComida(50); setPesoDocente(50); }}
-                  className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
-                    pesoHueco === 0 && pesoComida === 50 && pesoDocente === 50
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
-                >
-                  ⭐ Profe + Almuerzo (0% / 50% / 50%)
-                </button>
-
-                <button
-                  onClick={() => { setPesoHueco(50); setPesoComida(50); setPesoDocente(0); }}
-                  className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
-                    pesoHueco === 50 && pesoComida === 50 && pesoDocente === 0
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
-                >
-                  ☕ Modo Relax (50% / 50% / 0%)
-                </button>
-              </div>
-            </div>
-
-            {/* SLIDERS QUE AUTO-BALANCEAN A 100% */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-              
-              <div className="space-y-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-slate-700">⏳ Horas Hueco</span>
-                  <span className="font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
-                    {pesoHueco}%
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="1"
-                  value={pesoHueco}
-                  onChange={(e) => handleHuecoChange(Number(e.target.value))}
-                  className="w-full accent-indigo-600 cursor-pointer"
-                />
-              </div>
-
-              <div className="space-y-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-slate-700">🍱 Almuerzo Libre</span>
-                  <span className="font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100">
-                    {pesoComida}%
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="1"
-                  value={pesoComida}
-                  onChange={(e) => handleComidaChange(Number(e.target.value))}
-                  className="w-full accent-amber-600 cursor-pointer"
-                />
-              </div>
-
-              <div className="space-y-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-slate-700">👨‍🏫 Nota Docente</span>
-                  <span className="font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                    {pesoDocente}%
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="1"
-                  value={pesoDocente}
-                  onChange={(e) => handleDocenteChange(Number(e.target.value))}
-                  className="w-full accent-emerald-600 cursor-pointer"
-                />
-              </div>
-
-            </div>
-
-            {/* SECCIÓN FÓRMULA DIRECTA */}
-            {mostrarFormula && (
-              <div className="mt-4 p-4 rounded-xl bg-slate-900 text-slate-200 space-y-3 font-mono text-xs border border-slate-800 shadow-inner">
-                <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                  <span className="text-amber-400 font-bold">
-                    📐 Fórmula Directa del Puntaje Final (Match %)
-                  </span>
-                  <span className="text-[10px] bg-slate-800 text-emerald-400 font-bold px-2 py-0.5 rounded">
-                    ∑ Pesos = 100%
-                  </span>
-                </div>
-
-                <div className="space-y-2 text-[11px] leading-relaxed text-slate-300">
-                  <p>
-                    Las variables se normalizan a escala 0 - 100 y luego se multiplica por su porcentaje:
-                  </p>
-
-                  <div className="bg-slate-950 p-3 rounded-lg text-emerald-300 font-bold border border-slate-800 text-xs text-center">
-                    puntaje_final = ({pesoHueco}% × score_hueco) + ({pesoComida}% × score_comida) + ({pesoDocente}% × score_docente)
-                  </div>
-
-                  <p className="text-[10px] text-slate-400">
-                    * Nota: score_hueco y score_comida valen 100 cuando la opción es perfecta (0 horas perdidas).
-                  </p>
-                </div>
-              </div>
-            )}
-
-          </div>
-        )}
-
-        {/* LISTADO DE RESULTADOS */}
-        {!generando && horariosRankeados.length > 0 && (
-          <div className="space-y-4">
+        {/* CONTENEDOR PRINCIPAL: CONTROLES + RESULTADOS */}
+        {tieneResultadosAnteriores && (
+          <div className={`space-y-6 transition-all duration-300 ${generando ? 'opacity-50 pointer-events-none select-none filter blur-[0.5px]' : 'opacity-100'}`}>
             
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white px-5 py-3.5 rounded-2xl border border-slate-200 shadow-sm">
-              <div className="text-xs text-slate-600">
-                Mostrando <span className="font-bold text-slate-900">{inicioIndice + 1} - {Math.min(finIndice, horariosRankeados.length)}</span> de <span className="font-bold text-slate-900">{horariosRankeados.length}</span> opciones
+            {/* CONTROLES Y PRESETS */}
+            <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3 gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                      <span>🎛️</span> Personalizar Preferencias de Prioridad
+                    </h2>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      Suma Total: {sumaPesosActual}%
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Los porcentajes siempre suman 100% automáticamente al mover los controles.
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setMostrarFormula(!mostrarFormula)}
+                  className="text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1"
+                >
+                  <span>📐</span> {mostrarFormula ? 'Ocultar Fórmula' : 'Ver Fórmula de Match'}
+                </button>
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => cambiarPagina(paginaActual - 1)}
-                  disabled={paginaActual === 1}
-                  className="px-3 py-1.5 rounded-lg border text-xs font-bold transition-all disabled:opacity-40 bg-slate-50 text-slate-700"
-                >
-                  ← Anterior
-                </button>
-
-                <span className="text-xs font-bold px-2 py-1 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-100">
-                  {paginaActual} / {totalPaginas}
+              {/* PRESETS EXACTOS AL 100% */}
+              <div className="space-y-2">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Presets Rápidos (Suma 100%):
                 </span>
-
-                <button
-                  onClick={() => cambiarPagina(paginaActual + 1)}
-                  disabled={paginaActual === totalPaginas}
-                  className="px-3 py-1.5 rounded-lg border text-xs font-bold transition-all disabled:opacity-40 bg-slate-50 text-slate-700"
-                >
-                  Siguiente →
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {horariosPaginados.map((item, index) => {
-                const h = item.horario;
-                const posicionGlobal = inicioIndice + index + 1;
-                const esSeleccionado = estado.horario_seleccionado?.id === h.id;
-
-                return (
-                  <div
-                    key={h.id || posicionGlobal}
-                    className={`bg-white rounded-2xl border p-5 transition-all space-y-4 shadow-sm hover:shadow-md ${
-                      esSeleccionado
-                        ? 'border-indigo-500 ring-2 ring-indigo-500/20'
-                        : 'border-slate-200'
+                <div className="flex gap-1.5 flex-wrap">
+                  <button
+                    onClick={() => { setPesoHueco(100); setPesoComida(0); setPesoDocente(0); }}
+                    className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
+                      pesoHueco === 100 && pesoComida === 0 && pesoDocente === 0
+                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                     }`}
                   >
-                    <div className="flex justify-between items-start gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-black bg-slate-900 text-white px-2.5 py-1 rounded-lg">
-                          #{posicionGlobal}
-                        </span>
-                        {posicionGlobal === 1 && (
-                          <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md border border-amber-300">
-                            🥇 Recomendado
-                          </span>
-                        )}
-                        {h.cantidad_choques > 0 && (
-                          <span className="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded-md border border-rose-300">
-                            ⚠️ {h.cantidad_choques} choques
-                          </span>
-                        )}
-                      </div>
+                    ⏳ Menos Huecos (100% / 0% / 0%)
+                  </button>
 
-                      <div className="text-right">
-                        <div className="text-lg font-black text-indigo-600">
-                          {item.scoreTotal}%
-                        </div>
-                        <span className="text-[10px] text-slate-400 block font-medium">
-                          Match General
-                        </span>
-                      </div>
-                    </div>
+                  <button
+                    onClick={() => { setPesoHueco(0); setPesoComida(0); setPesoDocente(100); }}
+                    className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
+                      pesoHueco === 0 && pesoComida === 0 && pesoDocente === 100
+                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    👨‍🏫 Mejores Profes (0% / 0% / 100%)
+                  </button>
 
-                    <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                      <div className="bg-slate-50 p-2 rounded-xl border border-slate-100">
-                        <span className="text-slate-400 text-[10px] block">Horas Hueco</span>
-                        <span className="font-bold text-slate-800">{h.horas_hueco} hrs</span>
-                      </div>
-                      <div className="bg-slate-50 p-2 rounded-xl border border-slate-100">
-                        <span className="text-slate-400 text-[10px] block">Cruces Almuerzo</span>
-                        <span className="font-bold text-slate-800">{h.horas_comida} hrs</span>
-                      </div>
-                      <div className="bg-slate-50 p-2 rounded-xl border border-slate-100">
-                        <span className="text-slate-400 text-[10px] block">Puntaje Profes</span>
-                        <span className="font-bold text-slate-800">+{h.puntaje_docente} pts</span>
-                      </div>
-                    </div>
+                  <button
+                    onClick={() => { setPesoHueco(0); setPesoComida(100); setPesoDocente(0); }}
+                    className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
+                      pesoHueco === 0 && pesoComida === 100 && pesoDocente === 0
+                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    🍱 Hora de Almuerzo (0% / 100% / 0%)
+                  </button>
 
-                    <div className="space-y-1.5 border-t border-slate-100 pt-3">
-                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                        Secciones Asignadas:
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {h.secciones_elegidas.map((sec) => {
-                          const cursoObj = TODOS_LOS_CURSOS.find((c) => c.id === sec.curso_id);
-                          if (!cursoObj) return null;
+                  <button
+                    onClick={() => { setPesoHueco(34); setPesoComida(33); setPesoDocente(33); }}
+                    className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
+                      pesoHueco === 34 && pesoComida === 33 && pesoDocente === 33
+                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    ⚖️ Equilibrado (34% / 33% / 33%)
+                  </button>
 
-                          const teoNombre = sec.seccion_teo_id
-                            ? cursoObj.seccion_teo?.[sec.seccion_teo_id]?.seccion
-                            : null;
-                          const labNombre = sec.seccion_lab_id
-                            ? cursoObj.seccion_lab?.[sec.seccion_lab_id]?.seccion
-                            : null;
+                  <button
+                    onClick={() => { setPesoHueco(50); setPesoComida(0); setPesoDocente(50); }}
+                    className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
+                      pesoHueco === 50 && pesoComida === 0 && pesoDocente === 50
+                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    🔥 Profe + Sin Huecos (50% / 0% / 50%)
+                  </button>
 
-                          return (
-                            <span
-                              key={sec.curso_id}
-                              className="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 text-slate-700 flex items-center gap-1"
-                            >
-                              <span
-                                className="w-2 h-2 rounded-full inline-block"
-                                style={{ backgroundColor: cursoObj.color }}
-                              ></span>
-                              {cursoObj.SIGLAS}: {teoNombre ? `T.${teoNombre}` : ''} {labNombre ? `L.${labNombre}` : ''}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    </div>
+                  <button
+                    onClick={() => { setPesoHueco(0); setPesoComida(50); setPesoDocente(50); }}
+                    className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
+                      pesoHueco === 0 && pesoComida === 50 && pesoDocente === 50
+                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    ⭐ Profe + Almuerzo (0% / 50% / 50%)
+                  </button>
 
-                    <div className="flex gap-2 pt-2">
-                      <button
-                        onClick={() => handleSeleccionarHorario(h)}
-                        className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
-                          esSeleccionado
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                        }`}
-                      >
-                        {esSeleccionado ? '✓ Horario Activo' : 'Ver en Matriz Tabla'}
-                      </button>
+                  <button
+                    onClick={() => { setPesoHueco(50); setPesoComida(50); setPesoDocente(0); }}
+                    className={`text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all border ${
+                      pesoHueco === 50 && pesoComida === 50 && pesoDocente === 0
+                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    ☕ Modo Relax (50% / 50% / 0%)
+                  </button>
+                </div>
+              </div>
 
-                      <button
-                        onClick={() => {
-                          setHorarioAModalar(h);
-                          setNombreGuardar(`Horario #${posicionGlobal} (${item.scoreTotal}%)`);
-                        }}
-                        className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl"
-                      >
-                        ⭐
-                      </button>
-                    </div>
-
+              {/* SLIDERS QUE AUTO-BALANCEAN A 100% */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                <div className="space-y-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-bold text-slate-700">⏳ Horas Hueco</span>
+                    <span className="font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                      {pesoHueco}%
+                    </span>
                   </div>
-                );
-              })}
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={pesoHueco}
+                    onChange={(e) => handleHuecoChange(Number(e.target.value))}
+                    className="w-full accent-indigo-600 cursor-pointer"
+                  />
+                </div>
+
+                <div className="space-y-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-bold text-slate-700">🍱 Almuerzo Libre</span>
+                    <span className="font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100">
+                      {pesoComida}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={pesoComida}
+                    onChange={(e) => handleComidaChange(Number(e.target.value))}
+                    className="w-full accent-amber-600 cursor-pointer"
+                  />
+                </div>
+
+                <div className="space-y-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-bold text-slate-700">👨‍🏫 Nota Docente</span>
+                    <span className="font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                      {pesoDocente}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={pesoDocente}
+                    onChange={(e) => handleDocenteChange(Number(e.target.value))}
+                    className="w-full accent-emerald-600 cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* SECCIÓN FÓRMULA DIRECTA */}
+              {mostrarFormula && (
+                <div className="mt-4 p-4 rounded-xl bg-slate-900 text-slate-200 space-y-3 font-mono text-xs border border-slate-800 shadow-inner">
+                  <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <span className="text-amber-400 font-bold">
+                      📐 Fórmula Directa del Puntaje Final (Match %)
+                    </span>
+                    <span className="text-[10px] bg-slate-800 text-emerald-400 font-bold px-2 py-0.5 rounded">
+                      ∑ Pesos = 100%
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 text-[11px] leading-relaxed text-slate-300">
+                    <p>
+                      Las variables se normalizan a escala 0 - 100 y luego se multiplica por su porcentaje:
+                    </p>
+
+                    <div className="bg-slate-950 p-3 rounded-lg text-emerald-300 font-bold border border-slate-800 text-xs text-center">
+                      puntaje_final = ({pesoHueco}% × score_hueco) + ({pesoComida}% × score_comida) + ({pesoDocente}% × score_docente)
+                    </div>
+
+                    <p className="text-[10px] text-slate-400">
+                      * Nota: score_hueco y score_comida valen 100 cuando la opción es perfecta (0 horas perdidas).
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* LISTADO DE RESULTADOS PAGINADO */}
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white px-5 py-3.5 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="text-xs text-slate-600">
+                  Mostrando <span className="font-bold text-slate-900">{inicioIndice + 1} - {Math.min(finIndice, horariosRankeados.length)}</span> de <span className="font-bold text-slate-900">{horariosRankeados.length}</span> opciones
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => cambiarPagina(paginaActual - 1)}
+                    disabled={paginaActual === 1}
+                    className="px-3 py-1.5 rounded-lg border text-xs font-bold transition-all disabled:opacity-40 bg-slate-50 text-slate-700"
+                  >
+                    ← Anterior
+                  </button>
+
+                  <span className="text-xs font-bold px-2 py-1 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-100">
+                    {paginaActual} / {totalPaginas}
+                  </span>
+
+                  <button
+                    onClick={() => cambiarPagina(paginaActual + 1)}
+                    disabled={paginaActual === totalPaginas}
+                    className="px-3 py-1.5 rounded-lg border text-xs font-bold transition-all disabled:opacity-40 bg-slate-50 text-slate-700"
+                  >
+                    Siguiente →
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {horariosPaginados.map((item, index) => {
+                  const h = item.horario;
+                  const posicionGlobal = inicioIndice + index + 1;
+                  const esSeleccionado = estado.horario_seleccionado?.id === h.id;
+
+                  return (
+                    <div
+                      key={h.id || posicionGlobal}
+                      className={`bg-white rounded-2xl border p-5 transition-all space-y-4 shadow-sm hover:shadow-md ${
+                        esSeleccionado
+                          ? 'border-indigo-500 ring-2 ring-indigo-500/20'
+                          : 'border-slate-200'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-black bg-slate-900 text-white px-2.5 py-1 rounded-lg">
+                            #{posicionGlobal}
+                          </span>
+                          {posicionGlobal === 1 && (
+                            <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md border border-amber-300">
+                              🥇 Recomendado
+                            </span>
+                          )}
+                          {h.cantidad_choques > 0 && (
+                            <span className="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded-md border border-rose-300">
+                              ⚠️ {h.cantidad_choques} choques
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="text-right">
+                          <div className="text-lg font-black text-indigo-600">
+                            {item.scoreTotal}%
+                          </div>
+                          <span className="text-[10px] text-slate-400 block font-medium">
+                            Match General
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                        <div className="bg-slate-50 p-2 rounded-xl border border-slate-100">
+                          <span className="text-slate-400 text-[10px] block">Horas Hueco</span>
+                          <span className="font-bold text-slate-800">{h.horas_hueco} hrs</span>
+                        </div>
+                        <div className="bg-slate-50 p-2 rounded-xl border border-slate-100">
+                          <span className="text-slate-400 text-[10px] block">Cruces Almuerzo</span>
+                          <span className="font-bold text-slate-800">{h.horas_comida} hrs</span>
+                        </div>
+                        <div className="bg-slate-50 p-2 rounded-xl border border-slate-100">
+                          <span className="text-slate-400 text-[10px] block">Puntaje Profes</span>
+                          <span className="font-bold text-slate-800">+{h.puntaje_docente} pts</span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5 border-t border-slate-100 pt-3">
+                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                          Secciones Asignadas:
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {h.secciones_elegidas.map((sec) => {
+                            const cursoObj = TODOS_LOS_CURSOS.find((c) => c.id === sec.curso_id);
+                            if (!cursoObj) return null;
+
+                            const teoNombre = sec.seccion_teo_id
+                              ? cursoObj.seccion_teo?.[sec.seccion_teo_id]?.seccion
+                              : null;
+                            const labNombre = sec.seccion_lab_id
+                              ? cursoObj.seccion_lab?.[sec.seccion_lab_id]?.seccion
+                              : null;
+
+                            return (
+                              <span
+                                key={sec.curso_id}
+                                className="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 text-slate-700 flex items-center gap-1"
+                              >
+                                <span
+                                  className="w-2 h-2 rounded-full inline-block"
+                                  style={{ backgroundColor: cursoObj.color }}
+                                ></span>
+                                {cursoObj.SIGLAS}: {teoNombre ? `T.${teoNombre}` : ''} {labNombre ? `L.${labNombre}` : ''}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 pt-2">
+                        <button
+                          onClick={() => handleSeleccionarHorario(h)}
+                          className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+                            esSeleccionado
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                          }`}
+                        >
+                          {esSeleccionado ? '✓ Horario Activo' : 'Ver en Matriz Tabla'}
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setHorarioAModalar(h);
+                            setNombreGuardar(`Horario #${posicionGlobal} (${item.scoreTotal}%)`);
+                          }}
+                          className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl"
+                        >
+                          ⭐
+                        </button>
+                      </div>
+
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
           </div>
         )}
 
