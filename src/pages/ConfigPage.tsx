@@ -8,14 +8,8 @@ import { MaxChoquesSelector } from '../components/config/MaxChoquesSelector';
 import { HorasBloqueadasGrid } from '../components/config/HorasBloqueadasGrid';
 
 import { DIAS, HORAS } from '../data/constantes';
-import sistemas5Data from '../data/sistemas 5 año.json';
-
+import { CURSOS_DISPONIBLES } from '../data/cursos';
 import { useSistemaStorage } from '../hooks/useSistemaStorage';
-import type { Curso } from '../types';
-
-const CURSOS_DISPONIBLES: Record<string, Curso[]> = {
-  "sistemas_5_año": sistemas5Data.cursos as unknown as Curso[]
-};
 
 export const ConfigPage: React.FC = () => {
   const [estado, setEstado] = useSistemaStorage();
@@ -56,7 +50,7 @@ export const ConfigPage: React.FC = () => {
   };
 
   const handleLimpiarCursos = () => {
-    setEstado((prev) => ({ ...prev, cursos_seleccionados: {} }));
+    setEstado((prev) => ({ ...prev, cursos_seleccionados: {}, secciones_fijadas: {} }));
   };
 
   const totalCursos = Object.values(estado.cursos_seleccionados).reduce(
