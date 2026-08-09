@@ -1,167 +1,25 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { useSistemaStorage } from '../hooks/useSistemaStorage';
 import { TODOS_LOS_CURSOS, DOCENTES } from '../data/cursos';
 import { DIAS, HORAS } from '../data/constantes';
-import type { HorarioGenerado, CeldaMatriz, Seccion, MatrizHoras } from '../types';
-
-type SeccionElegida = HorarioGenerado['secciones_elegidas'][number];
-type CeldaConConflicto = CeldaMatriz & { esCruce?: boolean };
+import { useEditarHorario } from '../hooks/useEditarHorario';
 
 export const EditarHorarioPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [estado, setEstado] = useSistemaStorage();
-
-  const horarioInicial = estado.horario_seleccionado;
-
-  // Estado local para mutar las secciones del horario de manera aislada
-  const [seccionesEditables, setSeccionesEditables] = useState<SeccionElegida[]>(
-    horarioInicial?.secciones_elegidas || []
-  );
-
-  const totalCursosSeleccionados = Object.values(estado.cursos_seleccionados || {}).reduce(
-    (acc, arr) => acc + arr.length,
-    0
-  );
-
-  // Recalcular la matriz de horas mapeando directamente `lista_horas` (HorarioSesion[])
-  const { matrizReconstruida, cruces, puntajeDocente, horasHueco, diasConComida } = useMemo(() => {
-    const matriz: Record<number, Record<number, CeldaConConflicto>> = {};
-    const conflictos: string[] = [];
-    let puntaje = 0;
-
-    seccionesEditables.forEach((seleccion) => {
-      const curso = TODOS_LOS_CURSOS.find((c) => c.id === seleccion.curso_id);
-      if (!curso) return;
-
-      const teo = seleccion.seccion_teo_id
-        ? Object.values(curso.seccion_teo || {}).find((s) => s.id === seleccion.seccion_teo_id)
-        : undefined;
-
-      const lab = seleccion.seccion_lab_id
-        ? Object.values(curso.seccion_lab || {}).find((s) => s.id === seleccion.seccion_lab_id)
-        : undefined;
-
-      // Sumar puntaje docente
-      if (teo?.id_docente) {
-        const doc = DOCENTES.find((d) => d.id === teo.id_docente);
-        if (doc) puntaje += doc.peso;
-      }
-      if (lab?.id_docente) {
-        const doc = DOCENTES.find((d) => d.id === lab.id_docente);
-        if (doc) puntaje += doc.peso;
-      }
-
-      // Procesar lista_horas basada en HorarioSesion { dia_orden, hora_orden }
-      const procesarSeccion = (sec: Seccion, tipo: 'TEO' | 'LAB') => {
-        sec.lista_horas?.forEach((sesion) => {
-          const dia = sesion.dia_orden;
-          const hora = sesion.hora_orden;
-
-          if (!matriz[dia]) matriz[dia] = {};
-
-          if (matriz[dia][hora]) {
-            matriz[dia][hora].esCruce = true;
-            conflictos.push(
-              `Cruce el día ${DIAS.find((d) => d.orden === dia)?.nombre || dia} a la hora #${hora} entre ${matriz[dia][hora].curso_nombre} y ${curso.SIGLAS}`
-            );
-          } else {
-            matriz[dia][hora] = {
-              curso_id: curso.id,
-              curso_nombre: curso.SIGLAS,
-              seccion_nombre: sec.seccion,
-              aula: '',
-              tipo,
-            };
-          }
-        });
-      };
-
-      if (teo) procesarSeccion(teo, 'TEO');
-      if (lab) procesarSeccion(lab, 'LAB');
-    });
-
-    // Recalcular Huecos
-    let huecos = 0;
-    Object.keys(matriz).forEach((diaStr) => {
-      const dia = Number(diaStr);
-      const horasOcupadas = Object.keys(matriz[dia]).map(Number).sort((a, b) => a - b);
-      if (horasOcupadas.length > 1) {
-        const min = horasOcupadas[0];
-        const max = horasOcupadas[horasOcupadas.length - 1];
-        for (let h = min; h <= max; h++) {
-          if (!matriz[dia][h]) huecos++;
-        }
-      }
-    });
-
-    // Calcular disponibilidad de almuerzo según estado.hora_almuerzo
-    const bloquesComida = estado.hora_almuerzo && estado.hora_almuerzo.length > 0 ? estado.hora_almuerzo : [6, 7];
-    let diasComidaCount = 0;
-    Object.keys(matriz).forEach((diaStr) => {
-      const dia = Number(diaStr);
-      const tieneHoraLibre = bloquesComida.some((bloque) => !matriz[dia]?.[bloque]);
-      if (tieneHoraLibre) diasComidaCount++;
-    });
-
-    return {
-      matrizReconstruida: matriz,
-      cruces: conflictos,
-      puntajeDocente: puntaje,
-      horasHueco: huecos,
-      diasConComida: diasComidaCount,
-    };
-  }, [seccionesEditables, estado.hora_almuerzo]);
-
-  const handleCambiarSeccion = (
-    cursoId: number,
-    tipo: 'seccion_teo_id' | 'seccion_lab_id',
-    nuevaSeccionId: number | undefined
-  ) => {
-    setSeccionesEditables((prev) =>
-      prev.map((item) => {
-        if (item.curso_id === cursoId) {
-          return { ...item, [tipo]: nuevaSeccionId };
-        }
-        return item;
-      })
-    );
-  };
-
-  const handleGuardar = () => {
-    if (!horarioInicial) return;
-
-    // Convertir a la estructura estricta MatrizHoras
-    const matrizHorasFinal: MatrizHoras = {};
-    Object.keys(matrizReconstruida).forEach((diaStr) => {
-      const dia = Number(diaStr);
-      matrizHorasFinal[dia] = {};
-      Object.keys(matrizReconstruida[dia]).forEach((horaStr) => {
-        const hora = Number(horaStr);
-        const { esCruce, ...celdaLimpia } = matrizReconstruida[dia][hora];
-        matrizHorasFinal[dia][hora] = celdaLimpia;
-      });
-    });
-
-    const horarioActualizado: HorarioGenerado = {
-      ...horarioInicial,
-      secciones_elegidas: seccionesEditables,
-      matriz_horas: matrizHorasFinal,
-      horas_hueco: horasHueco,
-      horas_comida: diasConComida,
-      puntaje_docente: puntajeDocente,
-      cantidad_choques: cruces.length,
-    };
-
-    setEstado((prev) => ({
-      ...prev,
-      horario_seleccionado: horarioActualizado,
-    }));
-
-    navigate('/horario');
-  };
+  const {
+    horarioInicial,
+    seccionesEditables,
+    totalCursosSeleccionados,
+    matrizReconstruida,
+    cruces,
+    puntajeDocente,
+    horasHueco,
+    diasConComida,
+    handleCambiarSeccion,
+    handleGuardar,
+    navigate,
+  } = useEditarHorario();
 
   if (!horarioInicial) {
     return (

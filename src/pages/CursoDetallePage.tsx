@@ -1,31 +1,34 @@
-import React, { useState, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { DIAS, HORAS } from '../data/constantes';
-import { TODOS_LOS_CURSOS, DOCENTES } from '../data/cursos';
-import { useSistemaStorage } from '../hooks/useSistemaStorage';
-import type { Seccion, Docente } from '../types';
-
-interface CeldaPreview {
-  tipo: 'TEO' | 'LAB';
-  seccion: string;
-  esSeleccionado: boolean;
-}
+import { getDocenteInfoFormat } from '../services/docenteService';
+import { useCursoDetalle } from '../hooks/useCursoDetalle';
+import type { Seccion } from '../types';
 
 export const CursoDetallePage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const cursoId = Number(id);
-
-  const [estado, setEstado] = useSistemaStorage();
-  const [modoMatriz, setModoMatriz] = useState<'todos' | 'seleccion'>('todos');
-
-  const curso = TODOS_LOS_CURSOS.find((c) => c.id === cursoId);
-
-  const totalCursos = Object.values(estado.cursos_seleccionados || {}).reduce(
-    (acc, arr) => acc + arr.length,
-    0
-  );
+  const {
+    curso,
+    totalCursos,
+    modoMatriz,
+    setModoMatriz,
+    seccionesTeoList,
+    seccionesLabList,
+    selectedTeoId,
+    setSelectedTeoId,
+    selectedLabId,
+    setSelectedLabId,
+    isTeoFijada,
+    isLabFijada,
+    seccionTeoSeleccionada,
+    seccionLabSeleccionada,
+    matrizPreview,
+    handleToggleFijarTeo,
+    handleToggleFijarLab,
+    fijadaTeoId,
+    fijadaLabId,
+  } = useCursoDetalle();
 
   if (!curso) {
     return (
@@ -42,135 +45,27 @@ export const CursoDetallePage: React.FC = () => {
     );
   }
 
-  const fijadosCurso = estado.secciones_fijadas?.[cursoId];
-  const fijadaTeoId = fijadosCurso?.seccion_teo_id;
-  const fijadaLabId = fijadosCurso?.seccion_lab_id;
-
-  const seccionesTeoList: Seccion[] = curso.seccion_teo ? Object.values(curso.seccion_teo) : [];
-  const seccionesLabList: Seccion[] = curso.seccion_lab ? Object.values(curso.seccion_lab) : [];
-
-  const [selectedTeoId, setSelectedTeoId] = useState<number>(
-    fijadaTeoId || seccionesTeoList[0]?.id || 0
-  );
-  const [selectedLabId, setSelectedLabId] = useState<number>(
-    fijadaLabId || seccionesLabList[0]?.id || 0
-  );
-
-  const isTeoFijada = Boolean(fijadaTeoId && fijadaTeoId === selectedTeoId);
-  const isLabFijada = Boolean(fijadaLabId && fijadaLabId === selectedLabId);
-
-  const seccionTeoSeleccionada = seccionesTeoList.find((s) => s.id === selectedTeoId);
-  const seccionLabSeleccionada = seccionesLabList.find((s) => s.id === selectedLabId);
-
-  // Construcción de la matriz semanal completa (todas las secc o solo seleccionadas)
-  const matrizPreview = useMemo(() => {
-    const mapa: Record<number, Record<number, CeldaPreview[]>> = {};
-
-    const registrarBloque = (sec: Seccion, tipo: 'TEO' | 'LAB', esSeleccionado: boolean) => {
-      if (!sec || !sec.lista_horas) return;
-      sec.lista_horas.forEach((h) => {
-        if (!mapa[h.dia_orden]) mapa[h.dia_orden] = {};
-        if (!mapa[h.dia_orden][h.hora_orden]) mapa[h.dia_orden][h.hora_orden] = [];
-        mapa[h.dia_orden][h.hora_orden].push({
-          tipo,
-          seccion: sec.seccion,
-          esSeleccionado,
-        });
-      });
-    };
-
-    if (modoMatriz === 'seleccion') {
-      if (seccionTeoSeleccionada) registrarBloque(seccionTeoSeleccionada, 'TEO', true);
-      if (seccionLabSeleccionada) registrarBloque(seccionLabSeleccionada, 'LAB', true);
-    } else {
-      seccionesTeoList.forEach((sec) =>
-        registrarBloque(sec, 'TEO', sec.id === selectedTeoId)
-      );
-      seccionesLabList.forEach((sec) =>
-        registrarBloque(sec, 'LAB', sec.id === selectedLabId)
-      );
-    }
-
-    return mapa;
-  }, [
-    modoMatriz,
-    seccionTeoSeleccionada,
-    seccionLabSeleccionada,
-    seccionesTeoList,
-    seccionesLabList,
-    selectedTeoId,
-    selectedLabId,
-  ]);
-
-  const handleToggleFijarTeo = () => {
-    setEstado((prev) => {
-      const prevFijadas = prev.secciones_fijadas || {};
-      const actual = prevFijadas[cursoId] || {};
-      return {
-        ...prev,
-        secciones_fijadas: {
-          ...prevFijadas,
-          [cursoId]: {
-            ...actual,
-            seccion_teo_id: isTeoFijada ? undefined : selectedTeoId,
-          },
-        },
-      };
-    });
-  };
-
-  const handleToggleFijarLab = () => {
-    setEstado((prev) => {
-      const prevFijadas = prev.secciones_fijadas || {};
-      const actual = prevFijadas[cursoId] || {};
-      return {
-        ...prev,
-        secciones_fijadas: {
-          ...prevFijadas,
-          [cursoId]: {
-            ...actual,
-            seccion_lab_id: isLabFijada ? undefined : selectedLabId,
-          },
-        },
-      };
-    });
-  };
-
   const getNombreDia = (orden: number) => DIAS.find((d) => d.orden === orden)?.nombre || `Día ${orden}`;
   const getNombreHora = (orden: number) => HORAS.find((h) => h.orden === orden)?.nombre || `Bloque ${orden}`;
 
-  const getDocente = (idDocente: number): Docente | undefined => {
-    return DOCENTES.find((d) => d.id === idDocente);
-  };
-
   const renderDocenteBadge = (idDocente: number) => {
-    const doc = getDocente(idDocente);
-    if (!doc) {
-      return (
-        <div className="flex items-center gap-2 mt-1">
-          <span className="font-semibold text-slate-800 text-xs">👨‍🏫 No conocido</span>
-          <span className="text-[10px] px-2 py-0.5 rounded-md border font-bold bg-slate-100 text-slate-700 border-slate-300">
-            Neutral (0)
-          </span>
-        </div>
-      );
-    }
+    const docInfo = getDocenteInfoFormat(idDocente);
 
-    const configPeso: Record<number, { label: string; style: string }> = {
-      2: { label: 'Muy bueno (+2)', style: 'bg-emerald-100 text-emerald-800 border-emerald-300' },
-      1: { label: 'Bueno (+1)', style: 'bg-green-100 text-green-800 border-green-300' },
-      0: { label: 'Neutral (0)', style: 'bg-slate-100 text-slate-700 border-slate-300' },
-      '-1': { label: 'Malo (-1)', style: 'bg-amber-100 text-amber-800 border-amber-300' },
-      '-2': { label: 'Muy malo (-2)', style: 'bg-rose-100 text-rose-800 border-rose-300' },
+    const configStyle: Record<number, string> = {
+      2: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+      1: 'bg-green-100 text-green-800 border-green-300',
+      0: 'bg-slate-100 text-slate-700 border-slate-300',
+      '-1': 'bg-amber-100 text-amber-800 border-amber-300',
+      '-2': 'bg-rose-100 text-rose-800 border-rose-300',
     };
 
-    const rating = configPeso[doc.peso] || configPeso[0];
+    const style = configStyle[docInfo.peso] || configStyle[0];
 
     return (
       <div className="flex items-center gap-2 mt-1 flex-wrap">
-        <span className="font-semibold text-slate-800 text-xs">👨‍🏫 {doc.nombre}</span>
-        <span className={`text-[10px] px-2 py-0.5 rounded-md border font-bold ${rating.style}`}>
-          {rating.label}
+        <span className="font-semibold text-slate-800 text-xs">{docInfo.nombre}</span>
+        <span className={`text-[10px] px-2 py-0.5 rounded-md border font-bold ${style}`}>
+          {docInfo.etiqueta}
         </span>
       </div>
     );
@@ -198,8 +93,6 @@ export const CursoDetallePage: React.FC = () => {
       <Header totalCursosSeleccionados={totalCursos} />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-6">
-        
-        {/* ENCABEZADO */}
         <div>
           <Link to="/" className="text-xs text-indigo-600 hover:text-indigo-800 font-bold inline-flex items-center gap-1 mb-3">
             ← Volver a Configuración
@@ -232,7 +125,6 @@ export const CursoDetallePage: React.FC = () => {
           </div>
         </div>
 
-        {/* VISTA PREVIA MATRIZ SEMANAL COMPLETA (TEOS + LABS) */}
         <div className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3">
             <div>
@@ -244,7 +136,6 @@ export const CursoDetallePage: React.FC = () => {
               </p>
             </div>
 
-            {/* TOGGLE DE MODO: TODAS LAS SECCIONES VS SOLO SELECCIÓN */}
             <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-bold w-full sm:w-auto">
               <button
                 onClick={() => setModoMatriz('todos')}
@@ -346,10 +237,7 @@ export const CursoDetallePage: React.FC = () => {
           </div>
         </div>
 
-        {/* CONTROLES TEORÍA Y LABORATORIO */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* TEORÍA */}
           <div className={`p-4 sm:p-6 rounded-xl border bg-white transition-all ${
             isTeoFijada ? 'border-indigo-500 ring-2 ring-indigo-500/20' : 'border-slate-200'
           }`}>
@@ -411,7 +299,6 @@ export const CursoDetallePage: React.FC = () => {
             )}
           </div>
 
-          {/* LABORATORIO */}
           <div className={`p-4 sm:p-6 rounded-xl border bg-white transition-all ${
             isLabFijada ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-slate-200'
           }`}>
@@ -472,15 +359,12 @@ export const CursoDetallePage: React.FC = () => {
               <p className="text-xs text-slate-400">Sin secciones de laboratorio asignadas.</p>
             )}
           </div>
-
         </div>
 
-        {/* CATÁLOGO COMPLETO DE SECCIONES */}
         <div className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <h2 className="text-base font-bold text-slate-800">Catálogo Completo de Secciones</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Lista Teoría */}
             <div className="space-y-2">
               <h3 className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Teoría</h3>
               <div className="space-y-2">
@@ -512,7 +396,6 @@ export const CursoDetallePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Lista Laboratorio */}
             <div className="space-y-2">
               <h3 className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Laboratorio</h3>
               <div className="space-y-2">
@@ -545,7 +428,6 @@ export const CursoDetallePage: React.FC = () => {
             </div>
           </div>
         </div>
-
       </main>
 
       <Footer />

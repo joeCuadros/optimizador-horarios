@@ -1,139 +1,39 @@
-import React, { useState, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { useSistemaStorage } from '../hooks/useSistemaStorage';
 import { TODOS_LOS_CURSOS } from '../data/cursos';
-import type { HorarioGenerado } from '../types';
+import { useFavoritosPage } from '../hooks/useFavoritosPage';
 
 export const FavoritosPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [estado, setEstado] = useSistemaStorage();
-
-  // Estados de control local
-  const [busqueda, setBusqueda] = useState<string>('');
-  
-  // Modal de Renombrar
-  const [keyARenombrar, setKeyARenombrar] = useState<string | null>(null);
-  const [nuevoNombre, setNuevoNombre] = useState<string>('');
-
-  // Modal de Eliminar
-  const [keyAEliminar, setKeyAEliminar] = useState<string | null>(null);
-  const [mostrarModalVaciar, setMostrarModalVaciar] = useState<boolean>(false);
-
-  // Cursos seleccionados para el badge del Header
-  const totalCursosSeleccionados = Object.values(estado.cursos_seleccionados || {}).reduce(
-    (acc, arr) => acc + arr.length,
-    0
-  );
-
-  const favoritosMap = estado.horarios_guardados || {};
-  const listaFavoritos = useMemo(() => {
-    return Object.entries(favoritosMap).map(([nombre, horario]) => ({
-      nombre,
-      horario,
-    }));
-  }, [favoritosMap]);
-
-  // Filtrado por búsqueda
-  const favoritosFiltrados = useMemo(() => {
-    if (!busqueda.trim()) return listaFavoritos;
-    const q = busqueda.toLowerCase().trim();
-
-    return listaFavoritos.filter(({ nombre, horario }) => {
-      // Coincidencia por nombre del favorito
-      if (nombre.toLowerCase().includes(q)) return true;
-
-      // Coincidencia por sigla de curso incluido
-      return horario.secciones_elegidas.some((sec) => {
-        const cursoObj = TODOS_LOS_CURSOS.find((c) => c.id === sec.curso_id);
-        return cursoObj?.SIGLAS.toLowerCase().includes(q) || cursoObj?.nombre.toLowerCase().includes(q);
-      });
-    });
-  }, [listaFavoritos, busqueda]);
-
-  // Métricas agregadas
-  const totalFavoritos = listaFavoritos.length;
-  const promedioHuecos = useMemo(() => {
-    if (totalFavoritos === 0) return 0;
-    const suma = listaFavoritos.reduce((acc, f) => acc + f.horario.horas_hueco, 0);
-    return Math.round((suma / totalFavoritos) * 10) / 10;
-  }, [listaFavoritos, totalFavoritos]);
-
-  // =========================================================================
-  // HANDLERS
-  // =========================================================================
-
-  // Seleccionar como activo e ir a la matriz
-  const handleActivarHorario = (horarioObj: HorarioGenerado) => {
-    setEstado((prev) => ({
-      ...prev,
-      horario_seleccionado: horarioObj,
-    }));
-    navigate('/horario');
-  };
-
-  // Abrir Modal Renombrar
-  const handleAbrirRenombrar = (nombreActual: string) => {
-    setKeyARenombrar(nombreActual);
-    setNuevoNombre(nombreActual);
-  };
-
-  // Confirmar Renombrar
-  const handleConfirmarRenombrar = () => {
-    if (!keyARenombrar || !nuevoNombre.trim() || keyARenombrar === nuevoNombre.trim()) {
-      setKeyARenombrar(null);
-      return;
-    }
-
-    setEstado((prev) => {
-      const copia = { ...(prev.horarios_guardados || {}) };
-      const data = copia[keyARenombrar];
-      delete copia[keyARenombrar];
-      copia[nuevoNombre.trim()] = data;
-
-      return {
-        ...prev,
-        horarios_guardados: copia,
-      };
-    });
-
-    setKeyARenombrar(null);
-    setNuevoNombre('');
-  };
-
-  // Confirmar Eliminar Uno
-  const handleConfirmarEliminar = () => {
-    if (!keyAEliminar) return;
-
-    setEstado((prev) => {
-      const copia = { ...(prev.horarios_guardados || {}) };
-      delete copia[keyAEliminar];
-      return {
-        ...prev,
-        horarios_guardados: copia,
-      };
-    });
-
-    setKeyAEliminar(null);
-  };
-
-  // Confirmar Vaciar Todos
-  const handleVaciarTodos = () => {
-    setEstado((prev) => ({
-      ...prev,
-      horarios_guardados: {},
-    }));
-    setMostrarModalVaciar(false);
-  };
+  const {
+    estado,
+    busqueda,
+    setBusqueda,
+    keyARenombrar,
+    setKeyARenombrar,
+    nuevoNombre,
+    setNuevoNombre,
+    keyAEliminar,
+    setKeyAEliminar,
+    mostrarModalVaciar,
+    setMostrarModalVaciar,
+    totalCursosSeleccionados,
+    favoritosFiltrados,
+    totalFavoritos,
+    promedioHuecos,
+    handleActivarHorario,
+    handleAbrirRenombrar,
+    handleConfirmarRenombrar,
+    handleConfirmarEliminar,
+    handleVaciarTodos,
+  } = useFavoritosPage();
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Header totalCursosSeleccionados={totalCursosSeleccionados} />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-6">
-        
-        {/* ENCABEZADO Y MÉTRICAS */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
@@ -167,7 +67,6 @@ export const FavoritosPage: React.FC = () => {
           </div>
         </div>
 
-        {/* BARRA DE BÚSQUEDA / FILTRO */}
         {totalFavoritos > 0 && (
           <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
             <div className="relative w-full sm:max-w-md">
@@ -189,7 +88,6 @@ export const FavoritosPage: React.FC = () => {
           </div>
         )}
 
-        {/* GRILLA DE FAVORITOS */}
         {favoritosFiltrados.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {favoritosFiltrados.map(({ nombre, horario }) => {
@@ -204,7 +102,6 @@ export const FavoritosPage: React.FC = () => {
                       : 'border-slate-200'
                   }`}
                 >
-                  {/* Header de la tarjeta */}
                   <div className="flex justify-between items-start gap-2">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
@@ -240,7 +137,6 @@ export const FavoritosPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Chips de Métricas */}
                   <div className="grid grid-cols-3 gap-2 text-center text-xs">
                     <div className="bg-slate-50 p-2 rounded-xl border border-slate-100">
                       <span className="text-slate-400 text-[10px] block">Horas Hueco</span>
@@ -256,7 +152,6 @@ export const FavoritosPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Cursos y Secciones asignadas */}
                   <div className="space-y-1.5 border-t border-slate-100 pt-3">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                       Cursos Asignados ({horario.secciones_elegidas.length}):
@@ -289,7 +184,6 @@ export const FavoritosPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Acciones */}
                   <div className="pt-2">
                     <button
                       onClick={() => handleActivarHorario(horario)}
@@ -308,7 +202,6 @@ export const FavoritosPage: React.FC = () => {
           </div>
         )}
 
-        {/* ESTADO VACÍO (Si no hay coincidencia con la búsqueda) */}
         {totalFavoritos > 0 && favoritosFiltrados.length === 0 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
             <div className="text-3xl">🔍</div>
@@ -325,7 +218,6 @@ export const FavoritosPage: React.FC = () => {
           </div>
         )}
 
-        {/* ESTADO VACÍO GLOBAL (Si no hay guardados) */}
         {totalFavoritos === 0 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-4">
             <div className="text-4xl">⭐</div>
@@ -342,7 +234,6 @@ export const FavoritosPage: React.FC = () => {
           </div>
         )}
 
-        {/* MODAL RENOMBRAR */}
         {keyARenombrar && (
           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl border border-slate-100">
@@ -377,7 +268,6 @@ export const FavoritosPage: React.FC = () => {
           </div>
         )}
 
-        {/* MODAL ELIMINAR UNO */}
         {keyAEliminar && (
           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl border border-slate-100 text-center">
@@ -404,7 +294,6 @@ export const FavoritosPage: React.FC = () => {
           </div>
         )}
 
-        {/* MODAL VACIAR TODOS */}
         {mostrarModalVaciar && (
           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl border border-slate-100 text-center">
@@ -430,7 +319,6 @@ export const FavoritosPage: React.FC = () => {
             </div>
           </div>
         )}
-
       </main>
 
       <Footer />

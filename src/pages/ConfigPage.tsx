@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
@@ -9,54 +9,18 @@ import { HorasBloqueadasGrid } from '../components/config/HorasBloqueadasGrid';
 
 import { DIAS, HORAS } from '../data/constantes';
 import { CURSOS_DISPONIBLES } from '../data/cursos';
-import { useSistemaStorage } from '../hooks/useSistemaStorage';
+import { useConfigPage } from '../hooks/useConfigPage';
 
 export const ConfigPage: React.FC = () => {
-  const [estado, setEstado] = useSistemaStorage();
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const presetParam = searchParams.get('preset');
-
-    const estaVacio = Object.keys(estado.cursos_seleccionados).length === 0;
-
-    if (estaVacio) {
-      if (presetParam && CURSOS_DISPONIBLES[presetParam]) {
-        const ids = CURSOS_DISPONIBLES[presetParam].map((c) => c.id);
-        setEstado((prev) => ({
-          ...prev,
-          cursos_seleccionados: { [presetParam]: ids },
-        }));
-      }
-    }
-  }, []);
-
-  const handleToggleCurso = (grupo: string, cursoId: number) => {
-    setEstado((prev) => {
-      const listaGrupo = prev.cursos_seleccionados[grupo] || [];
-      const existe = listaGrupo.includes(cursoId);
-      const nuevaLista = existe
-        ? listaGrupo.filter((id) => id !== cursoId)
-        : [...listaGrupo, cursoId];
-
-      return {
-        ...prev,
-        cursos_seleccionados: {
-          ...prev.cursos_seleccionados,
-          [grupo]: nuevaLista,
-        },
-      };
-    });
-  };
-
-  const handleLimpiarCursos = () => {
-    setEstado((prev) => ({ ...prev, cursos_seleccionados: {}, secciones_fijadas: {} }));
-  };
-
-  const totalCursos = Object.values(estado.cursos_seleccionados).reduce(
-    (acc, arr) => acc + arr.length,
-    0
-  );
+  const {
+    estado,
+    totalCursos,
+    handleToggleCurso,
+    handleLimpiarCursos,
+    handleUpdateAlmuerzo,
+    handleUpdateMaxChoques,
+    handleUpdateHorasBloqueadas,
+  } = useConfigPage();
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -90,32 +54,26 @@ export const ConfigPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           <AlmuerzoSelector
             horaAlmuerzo={estado.hora_almuerzo}
-            onChangeAlmuerzo={(hora_almuerzo) =>
-              setEstado((prev) => ({ ...prev, hora_almuerzo }))
-            }
+            onChangeAlmuerzo={handleUpdateAlmuerzo}
             horas={HORAS}
           />
 
           <MaxChoquesSelector
             maxChoques={estado.max_choques}
-            onChangeMaxChoques={(max_choques) =>
-              setEstado((prev) => ({ ...prev, max_choques }))
-            }
+            onChangeMaxChoques={handleUpdateMaxChoques}
           />
         </div>
 
         {/* 4. Matriz de Horas Bloqueadas */}
         <HorasBloqueadasGrid
           horasBloqueadas={estado.horas_bloqueadas}
-          onChangeHorasBloqueadas={(horas_bloqueadas) =>
-            setEstado((prev) => ({ ...prev, horas_bloqueadas }))
-          }
+          onChangeHorasBloqueadas={handleUpdateHorasBloqueadas}
           dias={DIAS}
           horas={HORAS}
         />
       </main>
 
-      {/* Botón flotante pegado al pie de pantalla (solo móvil) */}
+      {/* Botón flotante para móviles */}
       <div className="sm:hidden fixed bottom-0 left-0 right-0 p-3 bg-white/90 backdrop-blur-md border-t border-slate-200 z-40">
         <Link
           to="/generar"

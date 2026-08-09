@@ -1,146 +1,35 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { useSistemaStorage } from '../hooks/useSistemaStorage';
-import { TODOS_LOS_CURSOS, DOCENTES } from '../data/cursos';
 import { DIAS, HORAS } from '../data/constantes';
-import { comprimirHorario, descomprimirHorario } from '../utils/scheduleCompress';
-import type { HorarioGenerado, CeldaMatriz, Curso, Seccion } from '../types';
-
-interface ModalDetalleInfo {
-  curso: Curso;
-  seccionTeo?: Seccion;
-  seccionLab?: Seccion;
-  celdaOrigen?: CeldaMatriz;
-}
+import { getDocenteInfoFormat } from '../services/docenteService';
+import { useHorarioPage } from '../hooks/useHorarioPage';
+import type { CeldaMatriz } from '../types';
 
 export const HorarioPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const [estado, setEstado] = useSistemaStorage();
-
-  const [copiado, setCopiado] = useState<boolean>(false);
-  
-  // Modal de Favoritos
-  const [modalGuardar, setModalGuardar] = useState<boolean>(false);
-  const [nombreFavorito, setNombreFavorito] = useState<string>('');
-
-  // Modal de Más Información del Curso / Bloque
-  const [modalInfo, setModalInfo] = useState<ModalDetalleInfo | null>(null);
-
-  // 1. Obtener horario desde la URL ?data=... o desde el Estado local
-  const dataParam = searchParams.get('data');
-
-  const horarioURL = useMemo(() => {
-    if (!dataParam) return null;
-    return descomprimirHorario(dataParam);
-  }, [dataParam]);
-
-  const horarioActivo: HorarioGenerado | null = horarioURL || estado.horario_seleccionado || null;
-
-  const totalCursosSeleccionados = Object.values(estado.cursos_seleccionados || {}).reduce(
-    (acc, arr) => acc + arr.length,
-    0
-  );
-
-  useEffect(() => {
-    if (horarioURL && (!estado.horario_seleccionado || estado.horario_seleccionado.id !== horarioURL.id)) {
-      setEstado((prev) => ({
-        ...prev,
-        horario_seleccionado: horarioURL,
-      }));
-    }
-  }, [horarioURL]);
-
-  // =========================================================================
-  // HELPERS DE BÚSQUEDA Y FORMATO
-  // =========================================================================
-  const obtenerCurso = (cursoId: number): Curso | undefined => {
-    return TODOS_LOS_CURSOS.find((c) => c.id === cursoId);
-  };
-
-  const obtenerDocenteInfo = (idDocente?: number) => {
-    if (!idDocente) {
-      return { nombre: '👨‍🏫 No conocido', etiqueta: 'Neutral (0)' };
-    }
-
-    const docente = DOCENTES.find((d) => d.id === idDocente);
-    if (!docente) {
-      return { nombre: '👨‍🏫 No conocido', etiqueta: 'Neutral (0)' };
-    }
-
-    const pesoEtiquetas: Record<number, string> = {
-      '-2': 'Muy malo (-2)',
-      '-1': 'Malo (-1)',
-      '0': 'Neutral (0)',
-      '1': 'Bueno (+1)',
-      '2': 'Muy bueno (+2)',
-    };
-
-    return {
-      nombre: `👨‍🏫 ${docente.nombre}`,
-      etiqueta: pesoEtiquetas[docente.peso] || `Neutral (${docente.peso})`,
-    };
-  };
-
-  // Abrir modal de información detallada
-  const handleAbrirDetalle = (cursoId: number, celda?: CeldaMatriz) => {
-    const cursoObj = obtenerCurso(cursoId);
-    if (!cursoObj) return;
-
-    const seleccion = horarioActivo?.secciones_elegidas.find((s) => s.curso_id === cursoId);
-
-    const seccionTeo = seleccion?.seccion_teo_id
-      ? Object.values(cursoObj.seccion_teo || {}).find((s) => s.id === seleccion.seccion_teo_id)
-      : undefined;
-
-    const seccionLab = seleccion?.seccion_lab_id
-      ? Object.values(cursoObj.seccion_lab || {}).find((s) => s.id === seleccion.seccion_lab_id)
-      : undefined;
-
-    setModalInfo({
-      curso: cursoObj,
-      seccionTeo,
-      seccionLab,
-      celdaOrigen: celda,
-    });
-  };
-
-  // Acciones de Enlace y Favoritos
-  const handleCopiarEnlace = () => {
-    if (!horarioActivo) return;
-
-    const compressed = comprimirHorario(horarioActivo);
-    const shareUrl = `${window.location.origin}/horario?data=${compressed}`;
-
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      setCopiado(true);
-      setTimeout(() => setCopiado(false), 3000);
-    });
-  };
-
-  const handleGuardarFavorito = () => {
-    if (!horarioActivo || !nombreFavorito.trim()) return;
-
-    setEstado((prev) => ({
-      ...prev,
-      horarios_guardados: {
-        ...(prev.horarios_guardados || {}),
-        [nombreFavorito.trim()]: horarioActivo,
-      },
-    }));
-
-    setModalGuardar(false);
-    setNombreFavorito('');
-  };
+  const {
+    dataParam,
+    horarioActivo,
+    totalCursosSeleccionados,
+    copiado,
+    modalGuardar,
+    setModalGuardar,
+    nombreFavorito,
+    setNombreFavorito,
+    modalInfo,
+    setModalInfo,
+    obtenerCurso,
+    handleAbrirDetalle,
+    handleCopiarEnlace,
+    handleGuardarFavorito,
+  } = useHorarioPage();
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Header totalCursosSeleccionados={totalCursosSeleccionados} />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-6">
-        
-        {/* BARRA SUPERIOR DE ACCIONES */}
         <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -183,7 +72,6 @@ export const HorarioPage: React.FC = () => {
                 <span>⭐ Guardar en Favoritos</span>
               </button>
 
-              {/* BOTÓN EDITAR QUE REEMPLAZA AL DE IMPRIMIR */}
               <Link
                 to="/horario/editar"
                 className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5"
@@ -194,7 +82,6 @@ export const HorarioPage: React.FC = () => {
           )}
         </div>
 
-        {/* MATRIZ DE HORARIO RESPONSIVA */}
         {horarioActivo ? (
           <div className="space-y-6">
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -215,13 +102,11 @@ export const HorarioPage: React.FC = () => {
                   <tbody>
                     {HORAS.map((hora) => (
                       <tr key={hora.orden} className="border-b border-slate-100 hover:bg-slate-50/50">
-                        {/* Columna de Hora */}
                         <td className="py-2 px-2 text-center font-mono font-semibold text-slate-500 bg-slate-50/80 border-r border-slate-200 text-[10px]">
                           <span className="block font-bold text-slate-700">#{hora.orden}</span>
                           <span>{hora.nombre}</span>
                         </td>
 
-                        {/* Celdas por Día */}
                         {DIAS.map((dia) => {
                           const celda: CeldaMatriz | null =
                             horarioActivo.matriz_horas?.[dia.orden]?.[hora.orden] || null;
@@ -266,7 +151,6 @@ export const HorarioPage: React.FC = () => {
               </div>
             </div>
 
-            {/* DETALLE DE SECCIONES ELEGIDAS */}
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
               <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between">
                 <span>📚 Secciones Asignadas ({horarioActivo.secciones_elegidas.length})</span>
@@ -286,8 +170,8 @@ export const HorarioPage: React.FC = () => {
                     ? Object.values(cursoObj.seccion_lab || {}).find((s) => s.id === sec.seccion_lab_id)
                     : null;
 
-                  const docenteTeo = obtenerDocenteInfo(teoObj?.id_docente);
-                  const docenteLab = obtenerDocenteInfo(labObj?.id_docente);
+                  const docenteTeo = getDocenteInfoFormat(teoObj?.id_docente);
+                  const docenteLab = getDocenteInfoFormat(labObj?.id_docente);
 
                   return (
                     <div
@@ -346,7 +230,6 @@ export const HorarioPage: React.FC = () => {
             </div>
           </div>
         ) : (
-          /* ESTADO VACÍO */
           <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-4">
             <div className="text-4xl">📅</div>
             <h3 className="text-base font-bold text-slate-800">No hay ningún horario activo en pantalla</h3>
@@ -362,7 +245,6 @@ export const HorarioPage: React.FC = () => {
           </div>
         )}
 
-        {/* MODAL MÁS INFORMACIÓN DEL CURSO */}
         {modalInfo && (
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-5 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
@@ -416,7 +298,7 @@ export const HorarioPage: React.FC = () => {
                   </div>
 
                   {(() => {
-                    const doc = obtenerDocenteInfo(modalInfo.seccionTeo.id_docente);
+                    const doc = getDocenteInfoFormat(modalInfo.seccionTeo.id_docente);
                     return (
                       <div className="text-xs text-slate-700 space-y-1">
                         <p className="font-medium">{doc.nombre}</p>
@@ -441,7 +323,7 @@ export const HorarioPage: React.FC = () => {
                   </div>
 
                   {(() => {
-                    const doc = obtenerDocenteInfo(modalInfo.seccionLab.id_docente);
+                    const doc = getDocenteInfoFormat(modalInfo.seccionLab.id_docente);
                     return (
                       <div className="text-xs text-slate-700 space-y-1">
                         <p className="font-medium">{doc.nombre}</p>
@@ -478,7 +360,6 @@ export const HorarioPage: React.FC = () => {
           </div>
         )}
 
-        {/* MODAL GUARDAR EN FAVORITOS */}
         {modalGuardar && (
           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl border border-slate-100">
@@ -512,7 +393,6 @@ export const HorarioPage: React.FC = () => {
             </div>
           </div>
         )}
-
       </main>
 
       <Footer />
