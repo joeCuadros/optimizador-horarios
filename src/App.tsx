@@ -3,10 +3,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ConfigPage } from './pages/ConfigPage';
 import { CursoDetallePage } from './pages/CursoDetallePage';
 import { GenerarPage } from './pages/GenerarPage';
+import { FavoritosPage } from './pages/FavoritosPage';
 
 // Componentes temporales para evitar errores mientras creas las demás pantallas
 const HorarioPage = () => <div className="p-8">Vista de Horario</div>;
-const FavoritosPage = () => <div className="p-8">Horarios Favoritos</div>;
 const EditarHorarioPage = () => <div className="p-8">Editar Horario</div>;
 
 export const App: React.FC = () => {
