@@ -8,3 +8,7 @@ export const CURSOS_DISPONIBLES: Record<string, Curso[]> = {
 };
 
 export const TODOS_LOS_CURSOS: Curso[] = Object.values(CURSOS_DISPONIBLES).flat();
+
+export const obtenerCursosPorIds = (ids: number[]): Curso[] => {
+  return TODOS_LOS_CURSOS.filter((c) => ids.includes(c.id));
+};
