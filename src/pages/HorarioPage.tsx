@@ -183,13 +183,13 @@ export const HorarioPage: React.FC = () => {
                 <span>⭐ Guardar en Favoritos</span>
               </button>
 
-              <button
-                onClick={() => window.print()}
-                className="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all"
-                title="Imprimir / Guardar en PDF"
+              {/* BOTÓN EDITAR QUE REEMPLAZA AL DE IMPRIMIR */}
+              <Link
+                to="/horario/editar"
+                className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5"
               >
-                🖨️
-              </button>
+                <span>✏️ Editar Horario</span>
+              </Link>
             </div>
           )}
         </div>
@@ -366,7 +366,6 @@ export const HorarioPage: React.FC = () => {
         {modalInfo && (
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-5 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
-              {/* Header Modal */}
               <div className="flex justify-between items-start border-b border-slate-100 pb-3">
                 <div className="space-y-1 pr-2">
                   <div className="flex items-center gap-2">
@@ -394,7 +393,6 @@ export const HorarioPage: React.FC = () => {
                 </button>
               </div>
 
-              {/* Info General del Curso */}
               <div className="grid grid-cols-2 gap-2 text-center text-xs">
                 <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
                   <span className="text-[10px] text-slate-400 font-bold block uppercase">Horas Teoría</span>
@@ -406,7 +404,6 @@ export const HorarioPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Detalle de Sección Teoría */}
               {modalInfo.seccionTeo && (
                 <div className="bg-indigo-50/50 border border-indigo-100 rounded-xl p-3.5 space-y-2">
                   <div className="flex justify-between items-center">
@@ -432,7 +429,6 @@ export const HorarioPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Detalle de Sección Laboratorio */}
               {modalInfo.seccionLab && (
                 <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-3.5 space-y-2">
                   <div className="flex justify-between items-center">
@@ -458,7 +454,6 @@ export const HorarioPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Si venía de una celda específica de la matriz */}
               {modalInfo.celdaOrigen && (
                 <div className="bg-slate-100 p-3 rounded-xl text-xs space-y-1">
                   <span className="text-[10px] font-bold text-slate-400 uppercase block">

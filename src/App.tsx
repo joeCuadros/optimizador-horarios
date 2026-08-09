@@ -2,12 +2,12 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ConfigPage } from './pages/ConfigPage';
 import { CursoDetallePage } from './pages/CursoDetallePage';
-import { GenerarPage } from './pages/GenerarPage';
 import { FavoritosPage } from './pages/FavoritosPage';
 import { HorarioPage } from './pages/HorarioPage';
+import { EditarHorarioPage } from './pages/EditarHorarioPage';
 
 // Componentes temporales para evitar errores mientras creas las demás pantallas
-const EditarHorarioPage = () => <div className="p-8">Editar Horario</div>;
+const GenerarPage = () => <div className="p-8">Generar Horario</div>;
 
 export const App: React.FC = () => {
   return (
