@@ -24,7 +24,8 @@
                     "id_docente": 1,
                     "lista_horas": [
                         { "dia_orden": 4, "hora_orden": 6 },
-                        { "dia_orden": 4, "hora_orden": 7 }
+                        { "dia_orden": 4, "hora_orden": 7 },
+                        { "dia_orden": 4, "hora_orden": 8 }
                     ]
                 },
                 "B": {
@@ -34,7 +35,8 @@
                     "id_docente": 1,
                     "lista_horas": [
                         { "dia_orden": 1, "hora_orden": 11 },
-                        { "dia_orden": 1, "hora_orden": 12 }
+                        { "dia_orden": 1, "hora_orden": 12 },
+                        { "dia_orden": 1, "hora_orden": 13 }
                     ]
                 }
             },
@@ -45,8 +47,8 @@
                     "id_curso": 1705270,
                     "id_docente": 1,
                     "lista_horas": [
-                        { "dia_orden": 2, "hora_orden": 2 },
-                        { "dia_orden": 2, "hora_orden": 3 }
+                        { "dia_orden": 1, "hora_orden": 1 },
+                        { "dia_orden": 1, "hora_orden": 2 }
                     ]
                 },
                 "B": {
@@ -55,8 +57,8 @@
                     "id_curso": 1705270,
                     "id_docente": 1,
                     "lista_horas": [
-                        { "dia_orden": 1, "hora_orden": 4 },
-                        { "dia_orden": 1, "hora_orden": 5 }
+                        { "dia_orden": 1, "hora_orden": 3 },
+                        { "dia_orden": 1, "hora_orden": 4 }
                     ]
                 },
                 "C": {
@@ -156,8 +158,8 @@
                     "id_curso": 1705273,
                     "id_docente": 1,
                     "lista_horas": [
-                        { "dia_orden": 5, "hora_orden": 2 },
-                        { "dia_orden": 5, "hora_orden": 3 }
+                        { "dia_orden": 5, "hora_orden": 1 },
+                        { "dia_orden": 5, "hora_orden": 2 }
                     ]
                 },
                 "B": {
@@ -176,8 +178,8 @@
                     "id_curso": 1705273,
                     "id_docente": 1,
                     "lista_horas": [
-                        { "dia_orden": 5, "hora_orden": 4 },
-                        { "dia_orden": 5, "hora_orden": 5 }
+                        { "dia_orden": 5, "hora_orden": 3 },
+                        { "dia_orden": 5, "hora_orden": 4 }
                     ]
                 },
                 "D": {
@@ -230,8 +232,8 @@
                     "id_curso": 1705274,
                     "id_docente": 1,
                     "lista_horas": [
-                        { "dia_orden": 2, "hora_orden": 4 },
-                        { "dia_orden": 2, "hora_orden": 5 }
+                        { "dia_orden": 2, "hora_orden": 3 },
+                        { "dia_orden": 2, "hora_orden": 4 }
                     ]
                 },
                 "B": {
@@ -250,8 +252,8 @@
                     "id_curso": 1705274,
                     "id_docente": 1,
                     "lista_horas": [
-                        { "dia_orden": 3, "hora_orden": 6 },
-                        { "dia_orden": 3, "hora_orden": 7 }
+                        { "dia_orden": 3, "hora_orden": 5 },
+                        { "dia_orden": 3, "hora_orden": 6 }
                     ]
                 },
                 "D": {
@@ -304,8 +306,8 @@
                     "id_curso": 1705275,
                     "id_docente": 1,
                     "lista_horas": [
-                        { "dia_orden": 3, "hora_orden": 2 },
-                        { "dia_orden": 3, "hora_orden": 3 }
+                        { "dia_orden": 2, "hora_orden": 1 },
+                        { "dia_orden": 2, "hora_orden": 2 }
                     ]
                 },
                 "B": {
@@ -324,8 +326,8 @@
                     "id_curso": 1705275,
                     "id_docente": 1,
                     "lista_horas": [
-                        { "dia_orden": 5, "hora_orden": 2 },
-                        { "dia_orden": 5, "hora_orden": 3 }
+                        { "dia_orden": 4, "hora_orden": 1 },
+                        { "dia_orden": 4, "hora_orden": 2 }
                     ]
                 },
                 "D": {
@@ -366,8 +368,8 @@
                     "id_curso": 1705276,
                     "id_docente": 1,
                     "lista_horas": [
-                        { "dia_orden": 1, "hora_orden": 13 },
-                        { "dia_orden": 1, "hora_orden": 14 }
+                        { "dia_orden": 1, "hora_orden": 14 },
+                        { "dia_orden": 1, "hora_orden": 15 }
                     ]
                 }
             },
@@ -388,8 +390,8 @@
                     "id_curso": 1705276,
                     "id_docente": 1,
                     "lista_horas": [
-                        { "dia_orden": 1, "hora_orden": 2 },
-                        { "dia_orden": 1, "hora_orden": 3 }
+                        { "dia_orden": 1, "hora_orden": 1 },
+                        { "dia_orden": 1, "hora_orden": 2 }
                     ]
                 },
                 "C": {
@@ -398,8 +400,8 @@
                     "id_curso": 1705276,
                     "id_docente": 1,
                     "lista_horas": [
-                        { "dia_orden": 2, "hora_orden": 9 },
-                        { "dia_orden": 2, "hora_orden": 10 }
+                        { "dia_orden": 3, "hora_orden": 9 },
+                        { "dia_orden": 3, "hora_orden": 10 }
                     ]
                 },
                 "D": {
@@ -408,8 +410,8 @@
                     "id_curso": 1705276,
                     "id_docente": 1,
                     "lista_horas": [
-                        { "dia_orden": 3, "hora_orden": 2 },
-                        { "dia_orden": 3, "hora_orden": 3 }
+                        { "dia_orden": 2, "hora_orden": 1 },
+                        { "dia_orden": 2, "hora_orden": 2 }
                     ]
                 }
             }
@@ -432,8 +434,10 @@
                     "lista_horas": [
                         { "dia_orden": 1, "hora_orden": 1 },
                         { "dia_orden": 1, "hora_orden": 2 },
+                        { "dia_orden": 1, "hora_orden": 3 },
                         { "dia_orden": 3, "hora_orden": 1 },
-                        { "dia_orden": 3, "hora_orden": 2 }
+                        { "dia_orden": 3, "hora_orden": 2 },
+                        { "dia_orden": 3, "hora_orden": 3 }
                     ]
                 },
                 "B": {
@@ -444,8 +448,10 @@
                     "lista_horas": [
                         { "dia_orden": 2, "hora_orden": 13 },
                         { "dia_orden": 2, "hora_orden": 14 },
+                        { "dia_orden": 2, "hora_orden": 15 },
                         { "dia_orden": 3, "hora_orden": 13 },
-                        { "dia_orden": 3, "hora_orden": 14 }
+                        { "dia_orden": 3, "hora_orden": 14 },
+                        { "dia_orden": 3, "hora_orden": 15 }
                     ]
                 },
                 "C": {
@@ -456,8 +462,10 @@
                     "lista_horas": [
                         { "dia_orden": 4, "hora_orden": 1 },
                         { "dia_orden": 4, "hora_orden": 2 },
+                        { "dia_orden": 4, "hora_orden": 3 },
                         { "dia_orden": 5, "hora_orden": 1 },
-                        { "dia_orden": 5, "hora_orden": 2 }
+                        { "dia_orden": 5, "hora_orden": 2 },
+                        { "dia_orden": 5, "hora_orden": 3 }
                     ]
                 },
                 "D": {
@@ -466,8 +474,10 @@
                     "id_curso": 1705279,
                     "id_docente": 1,
                     "lista_horas": [
+                        { "dia_orden": 1, "hora_orden": 1 },
                         { "dia_orden": 1, "hora_orden": 2 },
                         { "dia_orden": 1, "hora_orden": 3 },
+                        { "dia_orden": 5, "hora_orden": 1 },
                         { "dia_orden": 5, "hora_orden": 2 },
                         { "dia_orden": 5, "hora_orden": 3 }
                     ]
@@ -480,8 +490,10 @@
                     "lista_horas": [
                         { "dia_orden": 1, "hora_orden": 6 },
                         { "dia_orden": 1, "hora_orden": 7 },
+                        { "dia_orden": 1, "hora_orden": 8 },
                         { "dia_orden": 3, "hora_orden": 6 },
-                        { "dia_orden": 3, "hora_orden": 7 }
+                        { "dia_orden": 3, "hora_orden": 7 },
+                        { "dia_orden": 3, "hora_orden": 8 }
                     ]
                 },
                 "F": {
@@ -492,8 +504,10 @@
                     "lista_horas": [
                         { "dia_orden": 4, "hora_orden": 10 },
                         { "dia_orden": 4, "hora_orden": 11 },
+                        { "dia_orden": 4, "hora_orden": 12 },
                         { "dia_orden": 5, "hora_orden": 10 },
-                        { "dia_orden": 5, "hora_orden": 11 }
+                        { "dia_orden": 5, "hora_orden": 11 },
+                        { "dia_orden": 5, "hora_orden": 12 }
                     ]
                 },
                 "G": {
@@ -504,8 +518,10 @@
                     "lista_horas": [
                         { "dia_orden": 4, "hora_orden": 10 },
                         { "dia_orden": 4, "hora_orden": 11 },
+                        { "dia_orden": 4, "hora_orden": 12 },
                         { "dia_orden": 5, "hora_orden": 10 },
-                        { "dia_orden": 5, "hora_orden": 11 }
+                        { "dia_orden": 5, "hora_orden": 11 },
+                        { "dia_orden": 5, "hora_orden": 12 }
                     ]
                 },
                 "H": {
@@ -516,8 +532,10 @@
                     "lista_horas": [
                         { "dia_orden": 4, "hora_orden": 13 },
                         { "dia_orden": 4, "hora_orden": 14 },
+                        { "dia_orden": 4, "hora_orden": 15 },
                         { "dia_orden": 5, "hora_orden": 13 },
-                        { "dia_orden": 5, "hora_orden": 14 }
+                        { "dia_orden": 5, "hora_orden": 14 },
+                        { "dia_orden": 5, "hora_orden": 15 }
                     ]
                 }
             },
