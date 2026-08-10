@@ -1,7 +1,10 @@
-import { TODOS_LOS_CURSOS} from '../data/cursos';
+import { TODOS_LOS_CURSOS } from '../data/cursos';
 import { getDocenteById } from '../services/docenteService';
 import { DIAS, HORAS } from '../data/constantes';
+import { guardarEnIDB, eliminarDeIDB } from '../utils/indexedDBStorage';
 import type { HorarioGenerado, MatrizHoras, HorarioSesion, Seccion, Curso } from '../types';
+
+const IDB_KEY_HORARIOS = 'horarios_posibles_cache';
 
 // Logs de depuracion
 const DEBUG = true;
@@ -10,6 +13,7 @@ const log = (...args: unknown[]) => {
         console.log('[generator.worker]:', ...args);
     }
 };
+
 // Clases
 export interface SeccionPlana {
     tipo: 'teo' | 'lab';
@@ -97,6 +101,7 @@ function filtrarHorasBloqueadas(
     }
     return resultado.sort((a, b) => a.seccion.length - b.seccion.length);
 }
+
 // ---------------------------- Funciones para construir Horarios ----------------------------
 function armarHorarioGenerado(
     id: number,
@@ -258,10 +263,16 @@ self.onmessage = async (e: MessageEvent) => {
     log('Worker iniciado', e.data);
 
     try {
+        // Limpiar caché previo en IndexedDB desde el Worker
+        await eliminarDeIDB(IDB_KEY_HORARIOS);
+
         // paso de buscar cursos
         self.postMessage({ type: 'progress', message: 'Buscando cursos seleccionados...', progress: 10 });
         const cursosAProcesar = obtenerCursosSeleccionadosPlanos(e.data.cursos_seleccionados);
         log(cursosAProcesar);
+        if (cursosAProcesar.length === 0) {
+            throw new Error('No has seleccionado ningún curso para procesar.');
+        }
 
         // paso de desglosar secciones
         self.postMessage({ type: 'progress', message: 'Separando las secciones de teoría y laboratorio...', progress: 30 });
@@ -284,9 +295,12 @@ self.onmessage = async (e: MessageEvent) => {
         if (horariosGenerados.length === 0) {
             throw new Error('No se encontraron combinaciones de horarios válidas dentro del límite de choques permitidos.');
         }
-        // paso final
-        self.postMessage({ type: 'progress', message: 'Guardando horarios generados...', progress: 100 });
-        await new Promise((resolve) => setTimeout(resolve, 500)); // 0.5 segundo de espera
+
+        self.postMessage({ type: 'progress', message: 'Guardando horarios generados...', progress: 95 });
+        await guardarEnIDB(IDB_KEY_HORARIOS, horariosGenerados);
+
+        self.postMessage({ type: 'progress', message: 'Completando proceso...', progress: 100 });
+        await new Promise((resolve) => setTimeout(resolve, 300));
         log('Worker finalizado');
 
         self.postMessage({

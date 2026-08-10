@@ -7,7 +7,6 @@ const CLAVE_STORAGE = 'sistema_state';
 
 const estadoInicial: SistemaState = {
   cursos_seleccionados: {},
-  horarios_posibles: [],
   horario_seleccionado: null,
   horarios_guardados: {},
   hora_almuerzo: [7, 8, 9], //"12:20 a 14:50"

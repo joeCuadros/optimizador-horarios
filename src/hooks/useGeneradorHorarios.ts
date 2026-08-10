@@ -1,8 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSistemaStorage } from './useSistemaStorage';
+import { obtenerDeIDB } from '../utils/indexedDBStorage';
+import type { HorarioGenerado } from '../types';
+
+const IDB_KEY_HORARIOS = 'horarios_posibles_cache';
 
 export const useGeneradorHorarios = () => {
-  const [estado, setEstado] = useSistemaStorage();
+  const [estado] = useSistemaStorage();
+  const [horariosPosibles, setHorariosPosibles] = useState<HorarioGenerado[]>([]);
   const [cargando, setCargando] = useState<boolean>(false);
   const [mensajeProgreso, setMensajeProgreso] = useState<string>('');
   const [porcentajeProgreso, setPorcentajeProgreso] = useState<number>(0);
@@ -10,32 +15,34 @@ export const useGeneradorHorarios = () => {
 
   const workerRef = useRef<Worker | null>(null);
 
+  // Cargar datos en caché desde IndexedDB al montar el componente
+  useEffect(() => {
+    obtenerDeIDB<HorarioGenerado[]>(IDB_KEY_HORARIOS, []).then((horariosGuardados) => {
+      setHorariosPosibles(horariosGuardados);
+    });
+  }, []);
+
   useEffect(() => {
     workerRef.current = new Worker(
       new URL('../workers/generator.worker.ts', import.meta.url),
       { type: 'module' }
     );
 
-    workerRef.current.onmessage = (event) => {
+    workerRef.current.onmessage = async (event) => {
       const { type, message, progress, horarios } = event.data;
 
-      // Actualizar estado de progreso si viene en la respuesta
       if (message) setMensajeProgreso(message);
       if (progress !== undefined) setPorcentajeProgreso(progress);
 
-      // Si ocurre un error capturado en el Worker
       if (type === 'error') {
         setError(message || 'Ocurrió un error al procesar las combinaciones.');
         setCargando(false);
         return;
       }
 
-      // Si terminó la ejecución total exitosamente
       if (type === 'complete') {
-        setEstado((prev) => ({
-          ...prev,
-          horarios_posibles: horarios || [],
-        }));
+        // Como el Worker ya guardó en IndexedDB, solo actualizamos el estado de la vista
+        setHorariosPosibles(horarios || []);
         setError(null);
         setCargando(false);
       }
@@ -44,15 +51,12 @@ export const useGeneradorHorarios = () => {
     return () => {
       workerRef.current?.terminate();
     };
-  }, [setEstado]);
+  }, []);
 
-  const generarHorarios = () => {
+  const generarHorarios = async () => {
     if (!workerRef.current) return;
 
-    setEstado((prev) => ({
-      ...prev,
-      horarios_posibles: [],
-    }));
+    setHorariosPosibles([]);
     setError(null);
     setCargando(true);
     setMensajeProgreso('Iniciando cálculo...');
@@ -73,6 +77,6 @@ export const useGeneradorHorarios = () => {
     porcentajeProgreso,
     error,
     generarHorarios,
-    horariosPosibles: estado.horarios_posibles,
+    horariosPosibles,
   };
 };

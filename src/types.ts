@@ -68,7 +68,6 @@ export interface HorarioGenerado {
 export interface SistemaState {
   cursos_seleccionados: Record<string, number[]>; // ej: { "sistemas 5 año": [101, 102] }
   secciones_fijadas?: Record<number, { seccion_teo_id?: number; seccion_lab_id?: number }>; // { curso_id: { seccion_teo_id: 10 } }
-  horarios_posibles: HorarioGenerado[];
   horario_seleccionado: HorarioGenerado | null;
   horarios_guardados: Record<string, HorarioGenerado>; // ej: { "Horario Promedio": horarioObj, "Sin Mañanas": horarioObj }
   hora_almuerzo: number[]; // Bloques de hora_orden preferidos para comer (ej: [6, 7] = 12:00 a 14:00)
