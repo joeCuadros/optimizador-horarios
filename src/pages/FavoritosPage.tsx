@@ -110,7 +110,7 @@ export const FavoritosPage: React.FC = () => {
                         </h2>
                         {esActivo && (
                           <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-300">
-                            ✓ Activo en Matriz
+                            ✓ Activo en Horario
                           </span>
                         )}
                       </div>
@@ -193,7 +193,7 @@ export const FavoritosPage: React.FC = () => {
                           : 'bg-indigo-600 hover:bg-indigo-700 text-white'
                       }`}
                     >
-                      <span>{esActivo ? '✓ Activo (Ir a Matriz)' : '🚀 Seleccionar y Ver en Matriz'}</span>
+                      <span>{esActivo ? '✓ Activo (Ir a Horario)' : '🚀 Seleccionar y Ver en Horario'}</span>
                     </button>
                   </div>
                 </div>

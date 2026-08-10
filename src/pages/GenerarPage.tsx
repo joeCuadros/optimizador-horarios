@@ -24,7 +24,7 @@ const CRITERIOS_INFO: Record<CriterioOrden, CriterioMeta> = {
   cantidad_choques: { id: 'cantidad_choques', nombre: 'Menos Choques', icono: '⚡' },
   horas_hueco: { id: 'horas_hueco', nombre: 'Menos Huecos', icono: '⏱️' },
   puntaje_docente: { id: 'puntaje_docente', nombre: 'Mejor Docente', icono: '⭐' },
-  horas_comida: { id: 'horas_comida', nombre: 'Más Días Comida', icono: '🍲' }
+  horas_comida: { id: 'horas_comida', nombre: 'Más Días Comida', icono: '🍲' },
 };
 
 export const GenerarPage: React.FC = () => {
@@ -40,10 +40,15 @@ export const GenerarPage: React.FC = () => {
     horariosPosibles,
   } = useGeneradorHorarios();
 
-  // Transición para reordenar de forma asíncrona sin congelar la UI
+  // Estados para el Modal de Guardar Favorito
+  const [modalGuardar, setModalGuardar] = useState<boolean>(false);
+  const [nombreFavorito, setNombreFavorito] = useState<string>('');
+  const [horarioAFavorito, setHorarioAFavorito] = useState<HorarioGenerado | null>(null);
+
+  // Transición asíncrona para no congelar la vista al reordenar listas masivas
   const [isPending, startTransition] = useTransition();
 
-  // Prioridades por defecto
+  // Prioridades de desempate por defecto
   const [prioridades, setPrioridades] = useState<CriterioOrden[]>([
     'cantidad_choques',
     'horas_hueco',
@@ -51,7 +56,7 @@ export const GenerarPage: React.FC = () => {
     'puntaje_docente',
   ]);
 
-  // Algoritmo de ordenamiento multi-criterio
+  // Algoritmo de ordenamiento multinivel encadenado
   const horariosOrdenados = useMemo(() => {
     if (!horariosPosibles || horariosPosibles.length === 0) return [];
 
@@ -83,7 +88,7 @@ export const GenerarPage: React.FC = () => {
     });
   }, [horariosPosibles, prioridades]);
 
-  // Hook de paginación (10 por página)
+  // Hook de paginación (10 elementos por página)
   const {
     listaPaginada,
     paginaActual,
@@ -109,10 +114,9 @@ export const GenerarPage: React.FC = () => {
     nuevoOrden[index] = nuevoOrden[targetIndex];
     nuevoOrden[targetIndex] = temp;
 
-    // Ejecuta el reordenamiento de forma diferida y regresa a la página 1
     startTransition(() => {
       setPrioridades(nuevoOrden);
-      setPaginaActual(1);
+      setPaginaActual(1); // Regresa a la primera página tras reordenar
     });
   };
 
@@ -124,16 +128,29 @@ export const GenerarPage: React.FC = () => {
     navigate('/horario');
   };
 
-  const handleGuardarFavorito = (horario: HorarioGenerado, e: React.MouseEvent) => {
+  // Abrir Modal de Guardado
+  const handleAbrirModalGuardar = (horario: HorarioGenerado, e: React.MouseEvent) => {
     e.stopPropagation();
-    const nombre = `Horario #${horario.id} (${horario.horas_hueco}h hueco)`;
+    setHorarioAFavorito(horario);
+    setNombreFavorito(`Mi Horario #${horario.id} (${horario.horas_hueco}h hueco)`);
+    setModalGuardar(true);
+  };
+
+  // Confirmar Guardado en Favoritos
+  const handleConfirmarGuardarFavorito = () => {
+    if (!horarioAFavorito) return;
+    const nombre = nombreFavorito.trim() || `Horario #${horarioAFavorito.id}`;
+
     setEstado((prev) => ({
       ...prev,
       horarios_guardados: {
         ...(prev.horarios_guardados || {}),
-        [nombre]: horario,
+        [nombre]: horarioAFavorito,
       },
     }));
+
+    setModalGuardar(false);
+    setHorarioAFavorito(null);
   };
 
   return (
@@ -182,7 +199,7 @@ export const GenerarPage: React.FC = () => {
           </div>
         )}
 
-        {/* BARRA DE PROGRESO DEL WORKER */}
+        {/* BARRA DE PROGRESO */}
         {cargando && (
           <div className="bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm space-y-3 animate-fade-in">
             <div className="flex justify-between items-center text-xs font-bold text-slate-700">
@@ -204,7 +221,7 @@ export const GenerarPage: React.FC = () => {
           </div>
         )}
 
-        {/* CONTROLES DE PRIORIDAD Y FILTRADO */}
+        {/* CONTROLES DE DESEMPATE Y FILTRADO */}
         {!cargando && horariosPosibles.length > 0 && (
           <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
@@ -259,7 +276,7 @@ export const GenerarPage: React.FC = () => {
           </div>
         )}
 
-        {/* MUESTRA CARGANDO MIENTRAS SE PROCESA EL ORDENAMIENTO */}
+        {/* FEEDBACK MIENTRAS REORDENA */}
         {isPending && (
           <div className="bg-white p-12 rounded-2xl border border-slate-200 shadow-sm text-center space-y-2">
             <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -315,7 +332,7 @@ export const GenerarPage: React.FC = () => {
                       </div>
 
                       <button
-                        onClick={(e) => handleGuardarFavorito(horario, e)}
+                        onClick={(e) => handleAbrirModalGuardar(horario, e)}
                         className="text-slate-400 hover:text-amber-500 p-1.5 rounded-lg hover:bg-amber-50 transition-colors text-sm"
                         title="Guardar en favoritos"
                       >
@@ -381,7 +398,7 @@ export const GenerarPage: React.FC = () => {
 
                     <div className="pt-1">
                       <button className="w-full py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold text-xs rounded-xl transition-all">
-                        Ver Horario  →
+                        Ver Horario →
                       </button>
                     </div>
                   </div>
@@ -461,6 +478,43 @@ export const GenerarPage: React.FC = () => {
             >
               ← Revisar Cursos en Configuración
             </Link>
+          </div>
+        )}
+
+        {/* MODAL DE GUARDAR FAVORITO */}
+        {modalGuardar && (
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl border border-slate-100">
+              <h3 className="text-base font-bold text-slate-900">
+                Guardar en Favoritos
+              </h3>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1">
+                  Nombre para identificarlo:
+                </label>
+                <input
+                  type="text"
+                  value={nombreFavorito}
+                  onChange={(e) => setNombreFavorito(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  autoFocus
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => setModalGuardar(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleConfirmarGuardarFavorito}
+                  className="px-4 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm"
+                >
+                  Guardar
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </main>
