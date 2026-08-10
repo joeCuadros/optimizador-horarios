@@ -1,7 +1,7 @@
-import { TODOS_LOS_CURSOS, DOCENTES } from '../data/cursos';
+import { TODOS_LOS_CURSOS} from '../data/cursos';
+import { getDocenteById } from '../services/docenteService';
 import { DIAS, HORAS } from '../data/constantes';
 import type { HorarioGenerado, MatrizHoras, HorarioSesion, Seccion, Curso } from '../types';
-
 
 // Logs de depuracion
 const DEBUG = true;
@@ -119,7 +119,7 @@ function armarHorarioGenerado(
         const curso = TODOS_LOS_CURSOS.find((c) => c.id === sec.id_curso);
         const esTeo = curso?.seccion_teo && Object.values(curso.seccion_teo).some((t) => t.id === sec.id);
 
-        const doc = DOCENTES.find((d) => d.id === sec.id_docente);
+        const doc = getDocenteById(sec.id_docente);
         if (doc) puntaje_docente += doc.peso;
 
         sec.lista_horas?.forEach((h) => {

@@ -1,4 +1,4 @@
-import { DOCENTES } from '../data/cursos';
+import { DOCENTES } from '../data/docentes';
 import type { Docente } from '../types';
 
 export const getDocenteById = (idDocente?: number): Docente | undefined => {

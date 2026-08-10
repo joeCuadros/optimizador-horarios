@@ -2,7 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { TODOS_LOS_CURSOS, DOCENTES } from '../data/cursos';
+import { TODOS_LOS_CURSOS } from '../data/cursos';
+import { getDocenteInfoFormat } from '../services/docenteService';
 import { DIAS, HORAS } from '../data/constantes';
 import { useEditarHorario } from '../hooks/useEditarHorario';
 
@@ -64,11 +65,10 @@ export const EditarHorarioPage: React.FC = () => {
             <button
               onClick={handleGuardar}
               disabled={cruces.length > 0}
-              className={`px-5 py-2.5 font-bold text-xs rounded-xl transition-all shadow-sm ${
-                cruces.length > 0
-                  ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                  : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-              }`}
+              className={`px-5 py-2.5 font-bold text-xs rounded-xl transition-all shadow-sm ${cruces.length > 0
+                ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                }`}
             >
               💾 Guardar Cambios
             </button>
@@ -135,10 +135,10 @@ export const EditarHorarioPage: React.FC = () => {
                             className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                           >
                             {opcionesTeo.map((t) => {
-                              const doc = DOCENTES.find((d) => d.id === t.id_docente);
+                              const docInfo = getDocenteInfoFormat(t.id_docente);
                               return (
                                 <option key={t.id} value={t.id}>
-                                  Sección {t.seccion} ({doc ? doc.nombre : 'Docente N/A'})
+                                  Sección {t.seccion} ({docInfo.nombre})
                                 </option>
                               );
                             })}
@@ -163,10 +163,10 @@ export const EditarHorarioPage: React.FC = () => {
                             className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                           >
                             {opcionesLab.map((l) => {
-                              const doc = DOCENTES.find((d) => d.id === l.id_docente);
+                              const docInfo = getDocenteInfoFormat(l.id_docente);
                               return (
                                 <option key={l.id} value={l.id}>
-                                  Grupo {l.seccion} ({doc ? doc.nombre : 'Docente N/A'})
+                                  Grupo {l.seccion} ({docInfo.nombre})
                                 </option>
                               );
                             })}
@@ -220,9 +220,8 @@ export const EditarHorarioPage: React.FC = () => {
                             <td key={`${dia.orden}-${hora.orden}`} className="p-1 border-r border-slate-100 align-top h-12">
                               {celda && (
                                 <div
-                                  className={`p-1.5 rounded-lg text-white font-sans text-[10px] leading-tight space-y-0.5 shadow-sm ${
-                                    celda.esCruce ? 'bg-rose-600 animate-pulse' : ''
-                                  }`}
+                                  className={`p-1.5 rounded-lg text-white font-sans text-[10px] leading-tight space-y-0.5 shadow-sm ${celda.esCruce ? 'bg-rose-600 animate-pulse' : ''
+                                    }`}
                                   style={{ backgroundColor: celda.esCruce ? undefined : cursoObj?.color || '#4F46E5' }}
                                 >
                                   <div className="flex justify-between items-center font-black">

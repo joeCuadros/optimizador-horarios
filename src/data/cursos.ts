@@ -1,10 +1,8 @@
-import sistemas5Data from './sistemas 5 año.json';
-import type { Curso, Docente } from '../types';
-
-export const DOCENTES: Docente[] = (sistemas5Data.docentes || []) as unknown as Docente[];
+import sistemas5Data from './cursos/sistemas_5_año.json';
+import type { Curso } from '../types';
 
 export const CURSOS_DISPONIBLES: Record<string, Curso[]> = {
-  "sistemas_5_año": sistemas5Data.cursos as unknown as Curso[],
+  sistemas_5_año: sistemas5Data as unknown as Curso[],
 };
 
 export const TODOS_LOS_CURSOS: Curso[] = Object.values(CURSOS_DISPONIBLES).flat();
