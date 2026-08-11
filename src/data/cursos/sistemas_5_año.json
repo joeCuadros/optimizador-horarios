@@ -13,7 +13,7 @@
                 "id": 1,
                 "seccion": "A",
                 "id_curso": 1705270,
-                "id_docente": 1,
+                "id_docente": 4126,
                 "lista_horas": [
                     { "dia_orden": 4, "hora_orden": 6 },
                     { "dia_orden": 4, "hora_orden": 7 },
@@ -24,7 +24,7 @@
                 "id": 2,
                 "seccion": "B",
                 "id_curso": 1705270,
-                "id_docente": 1,
+                "id_docente": 4126,
                 "lista_horas": [
                     { "dia_orden": 1, "hora_orden": 11 },
                     { "dia_orden": 1, "hora_orden": 12 },
@@ -89,7 +89,7 @@
                 "id": 7,
                 "seccion": "A",
                 "id_curso": 1705271,
-                "id_docente": 1,
+                "id_docente": 6955,
                 "lista_horas": [
                     { "dia_orden": 1, "hora_orden": 4 },
                     { "dia_orden": 1, "hora_orden": 5 },
@@ -101,7 +101,7 @@
                 "id": 8,
                 "seccion": "B",
                 "id_curso": 1705271,
-                "id_docente": 1,
+                "id_docente": 6190,
                 "lista_horas": [
                     { "dia_orden": 2, "hora_orden": 9 },
                     { "dia_orden": 2, "hora_orden": 10 },
@@ -126,7 +126,7 @@
                 "id": 9,
                 "seccion": "A",
                 "id_curso": 1705273,
-                "id_docente": 1,
+                "id_docente": 4849,
                 "lista_horas": [
                     { "dia_orden": 5, "hora_orden": 6 },
                     { "dia_orden": 5, "hora_orden": 7 }
@@ -136,7 +136,7 @@
                 "id": 10,
                 "seccion": "B",
                 "id_curso": 1705273,
-                "id_docente": 1,
+                "id_docente": 4849,
                 "lista_horas": [
                     { "dia_orden": 2, "hora_orden": 11 },
                     { "dia_orden": 2, "hora_orden": 12 }
@@ -200,7 +200,7 @@
                 "id": 15,
                 "seccion": "A",
                 "id_curso": 1705274,
-                "id_docente": 1,
+                "id_docente": 6955,
                 "lista_horas": [
                     { "dia_orden": 2, "hora_orden": 1 },
                     { "dia_orden": 2, "hora_orden": 2 }
@@ -210,7 +210,7 @@
                 "id": 16,
                 "seccion": "B",
                 "id_curso": 1705274,
-                "id_docente": 1,
+                "id_docente": 6955,
                 "lista_horas": [
                     { "dia_orden": 3, "hora_orden": 11 },
                     { "dia_orden": 3, "hora_orden": 12 }
@@ -274,7 +274,7 @@
                 "id": 21,
                 "seccion": "A",
                 "id_curso": 1705275,
-                "id_docente": 1,
+                "id_docente": 3893,
                 "lista_horas": [
                     { "dia_orden": 3, "hora_orden": 4 },
                     { "dia_orden": 3, "hora_orden": 5 }
@@ -284,7 +284,7 @@
                 "id": 22,
                 "seccion": "B",
                 "id_curso": 1705275,
-                "id_docente": 1,
+                "id_docente": 3893,
                 "lista_horas": [
                     { "dia_orden": 1, "hora_orden": 9 },
                     { "dia_orden": 1, "hora_orden": 10 }
@@ -422,7 +422,7 @@
                 "id": 33,
                 "seccion": "A",
                 "id_curso": 1705279,
-                "id_docente": 1,
+                "id_docente": 4396,
                 "lista_horas": [
                     { "dia_orden": 1, "hora_orden": 1 },
                     { "dia_orden": 1, "hora_orden": 2 },
@@ -436,7 +436,7 @@
                 "id": 34,
                 "seccion": "B",
                 "id_curso": 1705279,
-                "id_docente": 1,
+                "id_docente": 4850,
                 "lista_horas": [
                     { "dia_orden": 2, "hora_orden": 13 },
                     { "dia_orden": 2, "hora_orden": 14 },
@@ -450,7 +450,7 @@
                 "id": 35,
                 "seccion": "C",
                 "id_curso": 1705279,
-                "id_docente": 1,
+                "id_docente": 1855,
                 "lista_horas": [
                     { "dia_orden": 4, "hora_orden": 1 },
                     { "dia_orden": 4, "hora_orden": 2 },
@@ -464,7 +464,7 @@
                 "id": 36,
                 "seccion": "D",
                 "id_curso": 1705279,
-                "id_docente": 1,
+                "id_docente": 30,
                 "lista_horas": [
                     { "dia_orden": 1, "hora_orden": 1 },
                     { "dia_orden": 1, "hora_orden": 2 },
@@ -478,7 +478,7 @@
                 "id": 37,
                 "seccion": "E",
                 "id_curso": 1705279,
-                "id_docente": 1,
+                "id_docente": 3750,
                 "lista_horas": [
                     { "dia_orden": 1, "hora_orden": 6 },
                     { "dia_orden": 1, "hora_orden": 7 },
@@ -492,7 +492,7 @@
                 "id": 38,
                 "seccion": "F",
                 "id_curso": 1705279,
-                "id_docente": 1,
+                "id_docente": 30,
                 "lista_horas": [
                     { "dia_orden": 4, "hora_orden": 10 },
                     { "dia_orden": 4, "hora_orden": 11 },
@@ -506,7 +506,7 @@
                 "id": 39,
                 "seccion": "G",
                 "id_curso": 1705279,
-                "id_docente": 1,
+                "id_docente": 3889,
                 "lista_horas": [
                     { "dia_orden": 4, "hora_orden": 10 },
                     { "dia_orden": 4, "hora_orden": 11 },
@@ -520,7 +520,7 @@
                 "id": 40,
                 "seccion": "H",
                 "id_curso": 1705279,
-                "id_docente": 1,
+                "id_docente": 3889,
                 "lista_horas": [
                     { "dia_orden": 4, "hora_orden": 13 },
                     { "dia_orden": 4, "hora_orden": 14 },
