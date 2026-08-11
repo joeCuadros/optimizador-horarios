@@ -133,7 +133,7 @@ function armarHorarioGenerado(
                     curso_id: sec.id_curso,
                     curso_nombre: curso?.nombre || '',
                     seccion_nombre: sec.seccion,
-                    aula: 'Aula',
+                    aula: sec.aula || 'No especificada',
                     tipo: esTeo ? 'TEO' : 'LAB',
                 };
             }

@@ -14,6 +14,7 @@
                 "seccion": "A",
                 "id_curso": 1705270,
                 "id_docente": 4126,
+                "aula": "Aula 205",
                 "lista_horas": [
                     { "dia_orden": 4, "hora_orden": 6 },
                     { "dia_orden": 4, "hora_orden": 7 },
@@ -25,6 +26,7 @@
                 "seccion": "B",
                 "id_curso": 1705270,
                 "id_docente": 4126,
+                "aula": "Aula 205",
                 "lista_horas": [
                     { "dia_orden": 1, "hora_orden": 11 },
                     { "dia_orden": 1, "hora_orden": 12 },

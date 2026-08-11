@@ -52,7 +52,7 @@ export const recalcularMatrizYMetricas = (
             curso_id: curso.id,
             curso_nombre: curso.SIGLAS,
             seccion_nombre: sec.seccion,
-            aula: '',
+            aula: sec.aula || 'No especificada',
             tipo,
           };
         }

@@ -24,6 +24,7 @@ export interface Seccion {
   seccion: string; // "A", "B", "C", etc.
   id_curso: number;
   id_docente: number;
+  aula: string;
   lista_horas: HorarioSesion[];
 }
 
