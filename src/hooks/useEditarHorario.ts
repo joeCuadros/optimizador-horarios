@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSistemaStorage } from './useSistemaStorage';
-import { recalcularMatrizYMetricas} from '../services/horarioService';
+import { recalcularMatrizYMetricas } from '../services/horarioService';
+import { TODOS_LOS_CURSOS } from '../data/cursos';
 import type { SeccionElegida } from '../services/horarioService';
 import type { HorarioGenerado, MatrizHoras } from '../types';
 
@@ -24,6 +25,7 @@ export const useEditarHorario = () => {
     return recalcularMatrizYMetricas(seccionesEditables, estado.hora_almuerzo);
   }, [seccionesEditables, estado.hora_almuerzo]);
 
+  // Cambiar sección de teoría o laboratorio
   const handleCambiarSeccion = (
     cursoId: number,
     tipo: 'seccion_teo_id' | 'seccion_lab_id',
@@ -39,6 +41,39 @@ export const useEditarHorario = () => {
     );
   };
 
+  // Agregar un curso nuevo seleccionando por defecto su primera sección de teoría/lab
+  const handleAgregarCurso = (cursoId: number) => {
+    const yaExiste = seccionesEditables.some((s) => s.curso_id === cursoId);
+    if (yaExiste) return;
+
+    const curso = TODOS_LOS_CURSOS.find((c) => c.id === cursoId);
+    if (!curso) return;
+
+    const teos = Object.values(curso.seccion_teo || {});
+    const labs = Object.values(curso.seccion_lab || {});
+
+    const nuevaSeccion: SeccionElegida = {
+      curso_id: cursoId,
+      seccion_teo_id: teos.length > 0 ? teos[0].id : undefined,
+      seccion_lab_id: labs.length > 0 ? labs[0].id : undefined,
+    };
+
+    setSeccionesEditables((prev) => [...prev, nuevaSeccion]);
+  };
+
+  // Quitar un curso del horario editable
+  const handleQuitarCurso = (cursoId: number) => {
+    setSeccionesEditables((prev) => prev.filter((item) => item.curso_id !== cursoId));
+  };
+
+  // Resetear cambios a la versión inicial del horario
+  const handleResetearCambios = () => {
+    if (horarioInicial) {
+      setSeccionesEditables(horarioInicial.secciones_elegidas || []);
+    }
+  };
+
+  // Guardar y consolidar la matriz final
   const handleGuardar = () => {
     if (!horarioInicial) return;
 
@@ -81,6 +116,9 @@ export const useEditarHorario = () => {
     horasHueco,
     diasConComida,
     handleCambiarSeccion,
+    handleAgregarCurso,
+    handleQuitarCurso,
+    handleResetearCambios,
     handleGuardar,
     navigate,
   };

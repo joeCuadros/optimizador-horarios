@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
@@ -18,16 +18,22 @@ export const EditarHorarioPage: React.FC = () => {
     horasHueco,
     diasConComida,
     handleCambiarSeccion,
+    handleAgregarCurso,
+    handleQuitarCurso,
     handleGuardar,
     navigate,
   } = useEditarHorario();
+
+  const [cursoAgregarId, setCursoAgregarId] = useState<number | ''>('');
 
   if (!horarioInicial) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col font-sans justify-between">
         <Header totalCursosSeleccionados={totalCursosSeleccionados} />
         <main className="max-w-md mx-auto p-8 text-center bg-white rounded-2xl border border-slate-200 shadow-sm my-12">
-          <p className="text-sm font-bold text-slate-800">No hay ningún horario seleccionado para editar.</p>
+          <p className="text-sm font-bold text-slate-800">
+            No hay ningún horario seleccionado para editar.
+          </p>
           <Link
             to="/generar"
             className="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white font-bold text-xs rounded-xl"
@@ -40,18 +46,30 @@ export const EditarHorarioPage: React.FC = () => {
     );
   }
 
+  // Filtrar cursos que aún no están agregados en la lista editable
+  const cursosDisponiblesParaAgregar = TODOS_LOS_CURSOS.filter(
+    (c) => !seccionesEditables.some((sec) => sec.curso_id === c.id)
+  );
+
+  const onConfirmarAgregarCurso = () => {
+    if (!cursoAgregarId) return;
+    handleAgregarCurso(Number(cursoAgregarId));
+    setCursoAgregarId('');
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Header totalCursosSeleccionados={totalCursosSeleccionados} />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-6">
+        {/* ENCABEZADO Y ACCIONES PRINCIPALES */}
         <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               Editor de Horario Manual ✏️
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Modifica las secciones asignadas y observa la matriz actualizarse en tiempo real.
+              Agrega, quita o modifica las secciones asignadas y observa la matriz actualizarse en tiempo real.
             </p>
           </div>
 
@@ -65,16 +83,18 @@ export const EditarHorarioPage: React.FC = () => {
             <button
               onClick={handleGuardar}
               disabled={cruces.length > 0}
-              className={`px-5 py-2.5 font-bold text-xs rounded-xl transition-all shadow-sm ${cruces.length > 0
-                ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                }`}
+              className={`px-5 py-2.5 font-bold text-xs rounded-xl transition-all shadow-sm ${
+                cruces.length > 0
+                  ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                  : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200'
+              }`}
             >
               💾 Guardar Cambios
             </button>
           </div>
         </div>
 
+        {/* ALERTAS DE CRUCES */}
         {cruces.length > 0 && (
           <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl text-xs space-y-1 text-rose-800 font-medium">
             <p className="font-black text-rose-900 flex items-center gap-1">
@@ -89,13 +109,48 @@ export const EditarHorarioPage: React.FC = () => {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* PANEL IZQUIERDO: AJUSTE Y GESTIÓN DE CURSOS */}
           <div className="lg:col-span-1 space-y-4">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
               <h2 className="text-sm font-black text-slate-900 border-b border-slate-100 pb-2">
-                ⚙️ Ajuste de Secciones
+                ⚙️ Ajuste de Cursos y Secciones
               </h2>
 
-              <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
+              {/* SELECTOR PARA AGREGAR CURSO NUEVO */}
+              {cursosDisponiblesParaAgregar.length > 0 && (
+                <div className="p-3 bg-indigo-50/60 border border-indigo-100 rounded-xl space-y-2">
+                  <label className="block text-[11px] font-bold text-indigo-900">
+                    ➕ Agregar Nuevo Curso al Horario:
+                  </label>
+                  <div className="flex gap-2">
+                    <select
+                      value={cursoAgregarId}
+                      onChange={(e) =>
+                        setCursoAgregarId(e.target.value ? Number(e.target.value) : '')
+                      }
+                      className="flex-1 p-2 bg-white border border-indigo-200 rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                    >
+                      <option value="">-- Seleccionar Curso --</option>
+                      {cursosDisponiblesParaAgregar.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.SIGLAS} - {c.nombre}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={onConfirmarAgregarCurso}
+                      disabled={!cursoAgregarId}
+                      className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold text-xs rounded-lg transition-all"
+                    >
+                      Agregar
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* LISTA DE CURSOS EDITABLES */}
+              <div className="space-y-4 max-h-[550px] overflow-y-auto pr-1">
                 {seccionesEditables.map((sec) => {
                   const curso = TODOS_LOS_CURSOS.find((c) => c.id === sec.curso_id);
                   if (!curso) return null;
@@ -106,18 +161,34 @@ export const EditarHorarioPage: React.FC = () => {
                   return (
                     <div
                       key={sec.curso_id}
-                      className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3"
+                      className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3 relative group"
                     >
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="w-3 h-3 rounded-full shrink-0"
-                          style={{ backgroundColor: curso.color }}
-                        ></span>
-                        <h3 className="text-xs font-black text-slate-800">
-                          {curso.SIGLAS} - <span className="font-normal text-slate-600">{curso.nombre}</span>
-                        </h3>
+                      {/* ENCABEZADO CURSO + BOTÓN QUITAR */}
+                      <div className="flex items-center justify-between gap-2 border-b border-slate-200/60 pb-2">
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <span
+                            className="w-3 h-3 rounded-full shrink-0"
+                            style={{ backgroundColor: curso.color }}
+                          ></span>
+                          <h3 className="text-xs font-black text-slate-800 truncate">
+                            {curso.SIGLAS} -{' '}
+                            <span className="font-normal text-slate-600">
+                              {curso.nombre}
+                            </span>
+                          </h3>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleQuitarCurso(sec.curso_id)}
+                          className="text-slate-400 hover:text-rose-600 hover:bg-rose-50 p-1 rounded-lg transition-colors text-xs shrink-0"
+                          title="Quitar curso del horario"
+                        >
+                          🗑️
+                        </button>
                       </div>
 
+                      {/* SELECTOR TEORÍA */}
                       {opcionesTeo.length > 0 && (
                         <div className="space-y-1">
                           <label className="block text-[10px] font-bold text-slate-500 uppercase">
@@ -134,6 +205,7 @@ export const EditarHorarioPage: React.FC = () => {
                             }
                             className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                           >
+                            <option value="">-- Ninguna --</option>
                             {opcionesTeo.map((t) => {
                               const docInfo = getDocenteInfoFormat(t.id_docente);
                               return (
@@ -146,6 +218,7 @@ export const EditarHorarioPage: React.FC = () => {
                         </div>
                       )}
 
+                      {/* SELECTOR LABORATORIO */}
                       {opcionesLab.length > 0 && (
                         <div className="space-y-1">
                           <label className="block text-[10px] font-bold text-slate-500 uppercase">
@@ -162,6 +235,7 @@ export const EditarHorarioPage: React.FC = () => {
                             }
                             className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                           >
+                            <option value="">-- Ninguno --</option>
                             {opcionesLab.map((l) => {
                               const docInfo = getDocenteInfoFormat(l.id_docente);
                               return (
@@ -180,14 +254,25 @@ export const EditarHorarioPage: React.FC = () => {
             </div>
           </div>
 
+          {/* PANEL DERECHO: VISTA PREVIA MATRIZ DINÁMICA */}
           <div className="lg:col-span-2 space-y-4">
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-slate-100 flex justify-between items-center text-xs">
-                <span className="font-bold text-slate-800">Vista Previa Dinámica</span>
+              <div className="p-4 border-b border-slate-100 flex flex-wrap justify-between items-center text-xs gap-2">
+                <span className="font-bold text-slate-800">
+                  Vista Previa Dinámica ({seccionesEditables.length} Cursos)
+                </span>
                 <div className="flex gap-3 text-slate-500 font-medium">
-                  <span>Huecos: <strong className="text-slate-800">{horasHueco}h</strong></span>
-                  <span>Días Comida: <strong className="text-slate-800">{diasConComida}/5</strong></span>
-                  <span>Puntaje Profes: <strong className="text-slate-800">+{puntajeDocente}</strong></span>
+                  <span>
+                    Huecos: <strong className="text-slate-800">{horasHueco}h</strong>
+                  </span>
+                  <span>
+                    Días Comida:{' '}
+                    <strong className="text-slate-800">{diasConComida}/5</strong>
+                  </span>
+                  <span>
+                    Puntaje Profes:{' '}
+                    <strong className="text-slate-800">+{puntajeDocente}</strong>
+                  </span>
                 </div>
               </div>
 
@@ -199,7 +284,10 @@ export const EditarHorarioPage: React.FC = () => {
                         Bloque
                       </th>
                       {DIAS.map((dia) => (
-                        <th key={dia.orden} className="py-2.5 px-2 text-center font-bold border-r border-slate-800/50">
+                        <th
+                          key={dia.orden}
+                          className="py-2.5 px-2 text-center font-bold border-r border-slate-800/50"
+                        >
                           {dia.nombre}
                         </th>
                       ))}
@@ -214,18 +302,30 @@ export const EditarHorarioPage: React.FC = () => {
 
                         {DIAS.map((dia) => {
                           const celda = matrizReconstruida?.[dia.orden]?.[hora.orden];
-                          const cursoObj = celda ? TODOS_LOS_CURSOS.find((c) => c.id === celda.curso_id) : null;
+                          const cursoObj = celda
+                            ? TODOS_LOS_CURSOS.find((c) => c.id === celda.curso_id)
+                            : null;
 
                           return (
-                            <td key={`${dia.orden}-${hora.orden}`} className="p-1 border-r border-slate-100 align-top h-12">
+                            <td
+                              key={`${dia.orden}-${hora.orden}`}
+                              className="p-1 border-r border-slate-100 align-top h-12"
+                            >
                               {celda && (
                                 <div
-                                  className={`p-1.5 rounded-lg text-white font-sans text-[10px] leading-tight space-y-0.5 shadow-sm ${celda.esCruce ? 'bg-rose-600 animate-pulse' : ''
-                                    }`}
-                                  style={{ backgroundColor: celda.esCruce ? undefined : cursoObj?.color || '#4F46E5' }}
+                                  className={`p-1.5 rounded-lg text-white font-sans text-[10px] leading-tight space-y-0.5 shadow-sm ${
+                                    celda.esCruce ? 'bg-rose-600 animate-pulse' : ''
+                                  }`}
+                                  style={{
+                                    backgroundColor: celda.esCruce
+                                      ? undefined
+                                      : cursoObj?.color || '#4F46E5',
+                                  }}
                                 >
                                   <div className="flex justify-between items-center font-black">
-                                    <span className="truncate">{celda.curso_nombre}</span>
+                                    <span className="truncate">
+                                      {celda.curso_nombre}
+                                    </span>
                                     <span className="text-[9px] bg-black/20 px-1 rounded ml-1 shrink-0">
                                       {celda.tipo} {celda.seccion_nombre}
                                     </span>
