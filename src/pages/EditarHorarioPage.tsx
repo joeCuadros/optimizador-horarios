@@ -297,7 +297,7 @@ export const EditarHorarioPage: React.FC = () => {
                     {HORAS.map((hora) => (
                       <tr key={hora.orden} className="border-b border-slate-100">
                         <td className="py-1.5 px-2 text-center font-mono font-semibold text-slate-500 bg-slate-50/80 border-r border-slate-200 text-[10px]">
-                          #{hora.orden}
+                          {hora.nombre}
                         </td>
 
                         {DIAS.map((dia) => {

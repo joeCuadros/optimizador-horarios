@@ -102,9 +102,8 @@ export const HorarioPage: React.FC = () => {
                   <tbody>
                     {HORAS.map((hora) => (
                       <tr key={hora.orden} className="border-b border-slate-100 hover:bg-slate-50/50">
-                        <td className="py-2 px-2 text-center font-mono font-semibold text-slate-500 bg-slate-50/80 border-r border-slate-200 text-[10px]">
-                          <span className="block font-bold text-slate-700">#{hora.orden}</span>
-                          <span>{hora.nombre}</span>
+                        <td className="py-2 px-2 text-center font-mono font-semibold text-slate-500 bg-slate-50/80 border-r border-slate-200 text-[12px]">
+                          <span className="block font-bold text-slate-700">{hora.nombre}</span>
                         </td>
 
                         {DIAS.map((dia) => {

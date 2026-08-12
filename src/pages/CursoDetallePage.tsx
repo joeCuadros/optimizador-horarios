@@ -77,14 +77,21 @@ export const CursoDetallePage: React.FC = () => {
     }
 
     return (
-      <ul className="space-y-1.5 mt-2">
-        {seccionObj.lista_horas.map((h, idx) => (
-          <li key={idx} className="text-xs bg-slate-100 text-slate-700 px-2.5 py-1.5 rounded-md flex justify-between items-center font-mono">
-            <span className="font-bold text-slate-900">{getNombreDia(h.dia_orden)}</span>
-            <span>{getNombreHora(h.hora_orden)}</span>
-          </li>
-        ))}
-      </ul>
+      <div className="space-y-2 mt-2">
+        {seccionObj.aula && (
+          <div className="text-[11px] font-mono font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-md inline-block">
+            📍 Aula: {seccionObj.aula}
+          </div>
+        )}
+        <ul className="space-y-1.5">
+          {seccionObj.lista_horas.map((h, idx) => (
+            <li key={idx} className="text-xs bg-slate-100 text-slate-700 px-2.5 py-1.5 rounded-md flex justify-between items-center font-mono">
+              <span className="font-bold text-slate-900">{getNombreDia(h.dia_orden)}</span>
+              <span>{getNombreHora(h.hora_orden)}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     );
   };
 
@@ -191,9 +198,8 @@ export const CursoDetallePage: React.FC = () => {
               <tbody>
                 {HORAS.map((hora) => (
                   <tr key={hora.orden} className="border-b border-slate-100 hover:bg-slate-50/50">
-                    <td className="py-1.5 px-2 text-center font-mono font-semibold text-slate-500 bg-slate-50/80 border-r border-slate-200 text-[10px]">
-                      <span className="block font-bold text-slate-800">Bloque {hora.orden}</span>
-                      <span>{hora.nombre}</span>
+                    <td className="py-1.5 px-2 text-center font-mono font-semibold text-slate-500 bg-slate-50/80 border-r border-slate-200 text-[12px]">
+                      <span className="block font-bold text-slate-800">{hora.nombre}</span>
                     </td>
 
                     {DIAS.map((dia) => {
@@ -221,7 +227,12 @@ export const CursoDetallePage: React.FC = () => {
                                         : 'bg-emerald-500/85 border-emerald-600'
                                     }`}
                                   >
-                                    {it.tipo} {it.seccion}
+                                    <div>{it.tipo} {it.seccion}</div>
+                                    {it.aula && (
+                                      <div className="text-[9px] opacity-90 truncate font-normal">
+                                        📍 {it.aula}
+                                      </div>
+                                    )}
                                   </div>
                                 );
                               })}
@@ -273,7 +284,7 @@ export const CursoDetallePage: React.FC = () => {
                   >
                     {seccionesTeoList.map((sec) => (
                       <option key={sec.id} value={sec.id}>
-                        Sección {sec.seccion} (ID: {sec.id})
+                        Sección {sec.seccion} (ID: {sec.id}) {sec.aula ? `- 📍 ${sec.aula}` : ''}
                       </option>
                     ))}
                   </select>
@@ -334,7 +345,7 @@ export const CursoDetallePage: React.FC = () => {
                   >
                     {seccionesLabList.map((sec) => (
                       <option key={sec.id} value={sec.id}>
-                        Sección {sec.seccion} (ID: {sec.id})
+                        Sección {sec.seccion} (ID: {sec.id}) {sec.aula ? `- 📍 ${sec.aula}` : ''}
                       </option>
                     ))}
                   </select>

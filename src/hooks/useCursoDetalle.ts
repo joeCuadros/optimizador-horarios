@@ -7,6 +7,7 @@ import type { Seccion } from '../types';
 export interface CeldaPreview {
   tipo: 'TEO' | 'LAB';
   seccion: string;
+  aula?: string; // 👈 Agregado para incluir la información del aula
   esSeleccionado: boolean;
 }
 
@@ -55,6 +56,7 @@ export const useCursoDetalle = () => {
         mapa[h.dia_orden][h.hora_orden].push({
           tipo,
           seccion: sec.seccion,
+          aula: sec.aula, // 👈 Pasamos el aula de la sección
           esSeleccionado,
         });
       });
