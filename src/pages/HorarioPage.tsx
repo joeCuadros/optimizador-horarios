@@ -13,16 +13,19 @@ export const HorarioPage: React.FC = () => {
     horarioActivo,
     totalCursosSeleccionados,
     copiado,
+    exportandoImg,
     modalGuardar,
     setModalGuardar,
     nombreFavorito,
     setNombreFavorito,
     modalInfo,
     setModalInfo,
+    tablaExportRef,
     obtenerCurso,
     handleAbrirDetalle,
     handleCopiarEnlace,
     handleGuardarFavorito,
+    handleDescargarImagen,
   } = useHorarioPage();
 
   return (
@@ -52,12 +55,19 @@ export const HorarioPage: React.FC = () => {
           {horarioActivo && (
             <div className="flex flex-wrap items-center gap-2">
               <button
+                onClick={handleDescargarImagen}
+                disabled={exportandoImg}
+                className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 disabled:opacity-50"
+              >
+                <span>{exportandoImg ? '⌛ Generando...' : '🖼️ Descargar PNG'}</span>
+              </button>
+
+              <button
                 onClick={handleCopiarEnlace}
-                className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm ${
-                  copiado
+                className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm ${copiado
                     ? 'bg-emerald-600 text-white'
                     : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200'
-                }`}
+                  }`}
               >
                 <span>{copiado ? '✓ ¡Enlace Copiado!' : '🔗 Compartir Horario'}</span>
               </button>
@@ -82,9 +92,10 @@ export const HorarioPage: React.FC = () => {
           )}
         </div>
 
+        {/* VISTA VISIBLE COMPLETA (TU DISEÑO RESPONSIVO INTACTO) */}
         {horarioActivo ? (
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse min-w-[700px] text-xs">
                   <thead>
@@ -244,6 +255,165 @@ export const HorarioPage: React.FC = () => {
           </div>
         )}
 
+        {/* NODO DE EXPORTACIÓN HD CON TAMAÑO FIJO Y FUENTES AMPLIADAS */}
+        {horarioActivo && (
+          <div style={{ position: 'absolute', top: 0, left: '-9999px', overflow: 'hidden' }}>
+            <div
+              ref={tablaExportRef}
+              style={{
+                width: '1400px',
+                backgroundColor: '#ffffff',
+                padding: '24px',
+                fontFamily: 'sans-serif',
+              }}
+            >
+              <table style={{ width: '100%', borderCollapse: 'collapse', border: '3px solid #0f172a' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#0f172a', color: '#ffffff' }}>
+                    <th
+                      style={{
+                        width: '240px',
+                        padding: '18px 10px',
+                        textAlign: 'center',
+                        fontWeight: 900,
+                        fontSize: '22px',
+                        borderRight: '2px solid #334155',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Bloque / Hora
+                    </th>
+                    {DIAS.map((dia) => (
+                      <th
+                        key={dia.orden}
+                        style={{
+                          padding: '18px 10px',
+                          textAlign: 'center',
+                          fontWeight: 900,
+                          fontSize: '24px',
+                          borderRight: '2px solid #334155',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        {dia.nombre}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {HORAS.map((hora) => (
+                    <tr key={hora.orden} style={{ borderBottom: '2px solid #cbd5e1' }}>
+                      {/* HORAS: Texto nítido de 22px */}
+                      <td
+                        style={{
+                          padding: '14px 6px',
+                          textAlign: 'center',
+                          fontFamily: 'monospace',
+                          fontWeight: 900,
+                          color: '#0f172a',
+                          backgroundColor: '#f8fafc',
+                          borderRight: '2px solid #cbd5e1',
+                          fontSize: '22px',
+                          lineHeight: '1.2',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {hora.nombre}
+                      </td>
+
+                      {DIAS.map((dia) => {
+                        const celda: CeldaMatriz | null =
+                          horarioActivo.matriz_horas?.[dia.orden]?.[hora.orden] || null;
+
+                        const cursoObj = celda ? obtenerCurso(celda.curso_id) : null;
+                        const siglas = cursoObj?.SIGLAS || celda?.curso_nombre || '';
+                        const color = cursoObj?.color || '#4F46E5';
+
+                        return (
+                          <td
+                            key={`${dia.orden}-${hora.orden}`}
+                            style={{
+                              padding: '4px',
+                              borderRight: '2px solid #cbd5e1',
+                              verticalAlign: 'top',
+                              height: '110px',
+                            }}
+                          >
+                            {celda && (
+                              <div
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  padding: '10px 12px',
+                                  borderRadius: '12px',
+                                  color: '#ffffff',
+                                  backgroundColor: color,
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  justifyContent: 'space-between',
+                                  boxSizing: 'border-box',
+                                }}
+                              >
+                                {/* Siglas (26px) y Badge Sección (16px) */}
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                  }}
+                                >
+                                  <span
+                                    style={{
+                                      fontSize: '26px',
+                                      fontWeight: 900,
+                                      lineHeight: '1',
+                                      letterSpacing: '-0.5px',
+                                    }}
+                                  >
+                                    {siglas}
+                                  </span>
+                                  <span
+                                    style={{
+                                      fontSize: '16px',
+                                      fontWeight: 900,
+                                      backgroundColor: 'rgba(0, 0, 0, 0.35)',
+                                      padding: '3px 8px',
+                                      borderRadius: '6px',
+                                      fontFamily: 'monospace',
+                                    }}
+                                  >
+                                    {celda.tipo} {celda.seccion_nombre}
+                                  </span>
+                                </div>
+
+                                {/* Aula (18px) */}
+                                {celda.aula && (
+                                  <div
+                                    style={{
+                                      fontSize: '18px',
+                                      fontWeight: 800,
+                                      fontFamily: 'monospace',
+                                      marginTop: '4px',
+                                      lineHeight: '1',
+                                    }}
+                                  >
+                                    📍 {celda.aula}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* MODALES */}
         {modalInfo && (
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-5 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">

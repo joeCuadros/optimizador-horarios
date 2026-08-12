@@ -1,5 +1,6 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { toPng } from 'html-to-image';
 import { useSistemaStorage } from './useSistemaStorage';
 import { TODOS_LOS_CURSOS } from '../data/cursos';
 import { comprimirHorario, descomprimirHorario } from '../utils/scheduleCompress';
@@ -17,9 +18,13 @@ export const useHorarioPage = () => {
   const [estado, setEstado] = useSistemaStorage();
 
   const [copiado, setCopiado] = useState<boolean>(false);
+  const [exportandoImg, setExportandoImg] = useState<boolean>(false);
   const [modalGuardar, setModalGuardar] = useState<boolean>(false);
   const [nombreFavorito, setNombreFavorito] = useState<string>('');
   const [modalInfo, setModalInfo] = useState<ModalDetalleInfo | null>(null);
+
+  // Referencia al contenedor oculto diseñado exclusivamente para exportación HD
+  const tablaExportRef = useRef<HTMLDivElement | null>(null);
 
   const dataParam = searchParams.get('data');
 
@@ -97,20 +102,48 @@ export const useHorarioPage = () => {
     setNombreFavorito('');
   };
 
+  // Función para capturar el nodo HD oculto sin afectar la vista del usuario
+  const handleDescargarImagen = async () => {
+    if (!tablaExportRef.current || !horarioActivo) return;
+
+    try {
+      setExportandoImg(true);
+
+      const dataUrl = await toPng(tablaExportRef.current, {
+        cacheBust: true,
+        quality: 1.0,
+        pixelRatio: 2, // Calidad Retina/HD
+        backgroundColor: '#ffffff',
+      });
+
+      const link = document.createElement('a');
+      link.download = `Horario_${horarioActivo.id}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error('Error al generar la imagen PNG del horario:', error);
+    } finally {
+      setExportandoImg(false);
+    }
+  };
+
   return {
     dataParam,
     horarioActivo,
     totalCursosSeleccionados,
     copiado,
+    exportandoImg,
     modalGuardar,
     setModalGuardar,
     nombreFavorito,
     setNombreFavorito,
     modalInfo,
     setModalInfo,
+    tablaExportRef,
     obtenerCurso,
     handleAbrirDetalle,
     handleCopiarEnlace,
     handleGuardarFavorito,
+    handleDescargarImagen,
   };
 };
