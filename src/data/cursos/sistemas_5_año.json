@@ -318,7 +318,7 @@
                 "id": 24,
                 "seccion": "B",
                 "id_curso": 1705275,
-                "id_docente": 1,
+                "id_docente": 7540,
                 "aula": "Lab 06",
                 "lista_horas": [
                     { "dia_orden": 5, "hora_orden": 13 },
@@ -376,7 +376,7 @@
                 "id": 29,
                 "seccion": "A",
                 "id_curso": 1705276,
-                "id_docente": 1,
+                "id_docente": 7923,
                 "aula": "Lab 04",
                 "lista_horas": [
                     { "dia_orden": 2, "hora_orden": 14 },
@@ -387,18 +387,18 @@
                 "id": 30,
                 "seccion": "B",
                 "id_curso": 1705276,
-                "id_docente": 1,
+                "id_docente": 7540,
                 "aula": "Lab 04",
                 "lista_horas": [
                     { "dia_orden": 1, "hora_orden": 1 },
                     { "dia_orden": 1, "hora_orden": 2 }
                 ]
             },
-            "D": {
+            "C": {
                 "id": 32,
-                "seccion": "D",
+                "seccion": "C",
                 "id_curso": 1705276,
-                "id_docente": 1,
+                "id_docente": 7923,
                 "aula": "Lab 04",
                 "lista_horas": [
                     { "dia_orden": 2, "hora_orden": 1 },
