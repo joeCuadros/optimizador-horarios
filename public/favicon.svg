@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Gradiente de fondo -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5" />
+      <stop offset="100%" stop-color="#3730A3" />
+    </linearGradient>
+
+    <!-- Gradiente para el rayo/simulación -->
+    <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+
+    <!-- Sombra suave para los bloques -->
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#0F172A" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Base redondeada con gradiente azul índigo -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+
+  <!-- Tarjeta contenedora estilo Matriz/Calendario -->
+  <rect x="72" y="88" width="368" height="336" rx="28" fill="#FFFFFF" filter="url(#softShadow)" />
+
+  <!-- Encabezado del Calendario -->
+  <path d="M 72 116 C 72 100.536 84.536 88 100 88 L 412 88 C 427.464 88 440 100.536 440 116 L 440 152 L 72 152 Z" fill="#EEF2FF" />
+
+  <!-- Indicadores de días / Puntos del header -->
+  <circle cx="120" cy="120" r="10" fill="#818CF8" />
+  <circle cx="152" cy="120" r="10" fill="#C7D2FE" />
+  <circle cx="184" cy="120" r="10" fill="#C7D2FE" />
+
+  <!-- Bloques de Cursos en la Matriz -->
+  <!-- Bloque 1 (Teoría - Azul) -->
+  <rect x="108" y="184" width="132" height="68" rx="14" fill="#4F46E5" />
+  <rect x="124" y="202" width="60" height="8" rx="4" fill="#FFFFFF" opacity="0.9" />
+  <rect x="124" y="218" width="40" height="6" rx="3" fill="#C7D2FE" />
+
+  <!-- Bloque 2 (Laboratorio - Verde) -->
+  <rect x="272" y="184" width="132" height="112" rx="14" fill="#10B981" />
+  <rect x="288" y="202" width="70" height="8" rx="4" fill="#FFFFFF" opacity="0.9" />
+  <rect x="288" y="218" width="48" height="6" rx="3" fill="#A7F3D0" />
+
+  <!-- Bloque 3 (Curso 2 - Violeta) -->
+  <rect x="108" y="276" width="132" height="112" rx="14" fill="#8B5CF6" />
+  <rect x="124" y="294" width="65" height="8" rx="4" fill="#FFFFFF" opacity="0.9" />
+  <rect x="124" y="310" width="44" height="6" rx="3" fill="#DDD6FE" />
+
+  <!-- Bloque 4 (Curso 3 - Naranja) -->
+  <rect x="272" y="320" width="132" height="68" rx="14" fill="#F97316" />
+  <rect x="288" y="338" width="55" height="8" rx="4" fill="#FFFFFF" opacity="0.9" />
+
+  <!-- Insignia / Círculo de Generación Rápida (Rayo) -->
+  <circle cx="400" cy="400" r="64" fill="#1E1B4B" />
+  <circle cx="400" cy="400" r="56" fill="#312E81" />
+  
+  <!-- Icono de Rayo / Algoritmo Optimizado -->
+  <path d="M 408 356 L 372 404 L 396 404 L 388 444 L 428 396 L 404 396 Z" fill="url(#boltGrad)" stroke="#FEF3C7" stroke-width="2" stroke-linejoin="round" />
+</svg>

@@ -1,0 +1,543 @@
+[
+    {
+        "id": 1705270,
+        "año_academico": "Quinto año",
+        "nombre": "TOPICOS AVANZADOS EN INGENIERIA DE SOFTWARE",
+        "SIGLAS": "TAIS",
+        "color": "#6366f1",
+        "valido": false,
+        "horas_teo": 3,
+        "horas_lab": 2,
+        "seccion_teo": {
+            "A": {
+                "id": 1,
+                "seccion": "A",
+                "id_curso": 1705270,
+                "id_docente": 4126,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 4, "hora_orden": 6 },
+                    { "dia_orden": 4, "hora_orden": 7 },
+                    { "dia_orden": 4, "hora_orden": 8 }
+                ]
+            },
+            "B": {
+                "id": 2,
+                "seccion": "B",
+                "id_curso": 1705270,
+                "id_docente": 4126,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 1, "hora_orden": 11 },
+                    { "dia_orden": 1, "hora_orden": 12 },
+                    { "dia_orden": 1, "hora_orden": 13 }
+                ]
+            }
+        },
+        "seccion_lab": {
+            "A": {
+                "id": 3,
+                "seccion": "A",
+                "id_curso": 1705270,
+                "id_docente": 4126,
+                "aula": "Lab 06",
+                "lista_horas": [
+                    { "dia_orden": 1, "hora_orden": 1 },
+                    { "dia_orden": 1, "hora_orden": 2 }
+                ]
+            },
+            "B": {
+                "id": 4,
+                "seccion": "B",
+                "id_curso": 1705270,
+                "id_docente": 4126,
+                "aula": "Lab 06",
+                "lista_horas": [
+                    { "dia_orden": 1, "hora_orden": 3 },
+                    { "dia_orden": 1, "hora_orden": 4 }
+                ]
+            },
+            "C": {
+                "id": 5,
+                "seccion": "C",
+                "id_curso": 1705270,
+                "id_docente": 4126,
+                "aula": "Lab 06",
+                "lista_horas": [
+                    { "dia_orden": 4, "hora_orden": 11 },
+                    { "dia_orden": 4, "hora_orden": 12 }
+                ]
+            },
+            "D": {
+                "id": 6,
+                "seccion": "D",
+                "id_curso": 1705270,
+                "id_docente": 4126,
+                "aula": "Lab 06",
+                "lista_horas": [
+                    { "dia_orden": 4, "hora_orden": 13 },
+                    { "dia_orden": 4, "hora_orden": 14 }
+                ]
+            }
+        }
+    },
+    {
+        "id": 1705271,
+        "año_academico": "Quinto año",
+        "nombre": "PRACTICAS PRE PROFESIONALES",
+        "SIGLAS": "PPP",
+        "color": "#059669",
+        "valido": false,
+        "horas_teo": 4,
+        "horas_lab": 0,
+        "seccion_teo": {
+            "A": {
+                "id": 7,
+                "seccion": "A",
+                "id_curso": 1705271,
+                "id_docente": 6955,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 1, "hora_orden": 4 },
+                    { "dia_orden": 1, "hora_orden": 5 },
+                    { "dia_orden": 5, "hora_orden": 4 },
+                    { "dia_orden": 5, "hora_orden": 5 }
+                ]
+            },
+            "B": {
+                "id": 8,
+                "seccion": "B",
+                "id_curso": 1705271,
+                "id_docente": 6190,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 2, "hora_orden": 9 },
+                    { "dia_orden": 2, "hora_orden": 10 },
+                    { "dia_orden": 3, "hora_orden": 9 },
+                    { "dia_orden": 3, "hora_orden": 10 }
+                ]
+            }
+        },
+        "seccion_lab": { }
+    },
+    {
+        "id": 1705273,
+        "año_academico": "Quinto año",
+        "nombre": "PROYECTO DE INGENIERIA DE SOFTWARE 2",
+        "SIGLAS": "PIS2",
+        "color": "#d97706",
+        "valido": false,
+        "horas_teo": 2,
+        "horas_lab": 2,
+        "seccion_teo": {
+            "A": {
+                "id": 9,
+                "seccion": "A",
+                "id_curso": 1705273,
+                "id_docente": 4849,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 5, "hora_orden": 6 },
+                    { "dia_orden": 5, "hora_orden": 7 }
+                ]
+            },
+            "B": {
+                "id": 10,
+                "seccion": "B",
+                "id_curso": 1705273,
+                "id_docente": 4849,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 2, "hora_orden": 11 },
+                    { "dia_orden": 2, "hora_orden": 12 }
+                ]
+            }
+        },
+        "seccion_lab": {
+            "A": {
+                "id": 11,
+                "seccion": "A",
+                "id_curso": 1705273,
+                "id_docente": 4849,
+                "aula": "Lab 02",
+                "lista_horas": [
+                    { "dia_orden": 5, "hora_orden": 1 },
+                    { "dia_orden": 5, "hora_orden": 2 }
+                ]
+            },
+            "B": {
+                "id": 12,
+                "seccion": "B",
+                "id_curso": 1705273,
+                "id_docente": 4849,
+                "aula": "Lab 02",
+                "lista_horas": [
+                    { "dia_orden": 3, "hora_orden": 9 },
+                    { "dia_orden": 3, "hora_orden": 10 }
+                ]
+            },
+            "C": {
+                "id": 13,
+                "seccion": "C",
+                "id_curso": 1705273,
+                "id_docente": 4849,
+                "aula": "Lab 02",
+                "lista_horas": [
+                    { "dia_orden": 5, "hora_orden": 3 },
+                    { "dia_orden": 5, "hora_orden": 4 }
+                ]
+            },
+            "D": {
+                "id": 14,
+                "seccion": "D",
+                "id_curso": 1705273,
+                "id_docente": 4849,
+                "aula": "Lab 02",
+                "lista_horas": [
+                    { "dia_orden": 1, "hora_orden": 11 },
+                    { "dia_orden": 1, "hora_orden": 12 }
+                ]
+            }
+        }
+    },
+    {
+        "id": 1705274,
+        "año_academico": "Quinto año",
+        "nombre": "GESTION DE SISTEMAS Y TECNOLOGIAS DE INFORMACION (E)",
+        "SIGLAS": "GSTI",
+        "color": "#dc2626",
+        "valido": false,
+        "horas_teo": 2,
+        "horas_lab": 2,
+        "seccion_teo": {
+            "A": {
+                "id": 15,
+                "seccion": "A",
+                "id_curso": 1705274,
+                "id_docente": 6955,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 2, "hora_orden": 1 },
+                    { "dia_orden": 2, "hora_orden": 2 }
+                ]
+            },
+            "B": {
+                "id": 16,
+                "seccion": "B",
+                "id_curso": 1705274,
+                "id_docente": 6955,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 3, "hora_orden": 11 },
+                    { "dia_orden": 3, "hora_orden": 12 }
+                ]
+            }
+        },
+        "seccion_lab": {
+            "A": {
+                "id": 17,
+                "seccion": "A",
+                "id_curso": 1705274,
+                "id_docente": 6955,
+                "aula": "Lab 06",
+                "lista_horas": [
+                    { "dia_orden": 2, "hora_orden": 3 },
+                    { "dia_orden": 2, "hora_orden": 4 }
+                ]
+            },
+            "B": {
+                "id": 18,
+                "seccion": "B",
+                "id_curso": 1705274,
+                "id_docente": 6955,
+                "aula": "Lab 06",
+                "lista_horas": [
+                    { "dia_orden": 2, "hora_orden": 7 },
+                    { "dia_orden": 2, "hora_orden": 8 }
+                ]
+            },
+            "C": {
+                "id": 19,
+                "seccion": "C",
+                "id_curso": 1705274,
+                "id_docente": 6955,
+                "aula": "Lab 06",
+                "lista_horas": [
+                    { "dia_orden": 3, "hora_orden": 9 },
+                    { "dia_orden": 3, "hora_orden": 10 }
+                ]
+            }
+        }
+    },
+    {
+        "id": 1705275,
+        "año_academico": "Quinto año",
+        "nombre": "DESARROLLO DE SOFTWARE PARA JUEGOS (E)",
+        "SIGLAS": "DSJ",
+        "color": "#8b5cf6",
+        "valido": false,
+        "horas_teo": 2,
+        "horas_lab": 2,
+        "seccion_teo": {
+            "A": {
+                "id": 21,
+                "seccion": "A",
+                "id_curso": 1705275,
+                "id_docente": 3893,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 3, "hora_orden": 4 },
+                    { "dia_orden": 3, "hora_orden": 5 }
+                ]
+            },
+            "B": {
+                "id": 22,
+                "seccion": "B",
+                "id_curso": 1705275,
+                "id_docente": 3893,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 1, "hora_orden": 9 },
+                    { "dia_orden": 1, "hora_orden": 10 }
+                ]
+            }
+        },
+        "seccion_lab": {
+            "A": {
+                "id": 23,
+                "seccion": "A",
+                "id_curso": 1705275,
+                "id_docente": 3893,
+                "aula": "Lab 06",
+                "lista_horas": [
+                    { "dia_orden": 2, "hora_orden": 1 },
+                    { "dia_orden": 2, "hora_orden": 2 }
+                ]
+            },
+            "B": {
+                "id": 24,
+                "seccion": "B",
+                "id_curso": 1705275,
+                "id_docente": 7540,
+                "aula": "Lab 06",
+                "lista_horas": [
+                    { "dia_orden": 5, "hora_orden": 13 },
+                    { "dia_orden": 5, "hora_orden": 14 }
+                ]
+            },
+            "C": {
+                "id": 25,
+                "seccion": "C",
+                "id_curso": 1705275,
+                "id_docente": 3893,
+                "aula": "Lab 06",
+                "lista_horas": [
+                    { "dia_orden": 4, "hora_orden": 1 },
+                    { "dia_orden": 4, "hora_orden": 2 }
+                ]
+            }
+        }
+    },
+    {
+        "id": 1705276,
+        "año_academico": "Quinto año",
+        "nombre": "PLATAFORMAS EMERGENTES (E)",
+        "SIGLAS": "PE",
+        "color": "#14b8a6",
+        "valido": false,
+        "horas_teo": 2,
+        "horas_lab": 2,
+        "seccion_teo": {
+            "A": {
+                "id": 27,
+                "seccion": "A",
+                "id_curso": 1705276,
+                "id_docente": 1,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 4, "hora_orden": 4 },
+                    { "dia_orden": 4, "hora_orden": 5 }
+                ]
+            },
+            "B": {
+                "id": 28,
+                "seccion": "B",
+                "id_curso": 1705276,
+                "id_docente": 1,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 1, "hora_orden": 14 },
+                    { "dia_orden": 1, "hora_orden": 15 }
+                ]
+            }
+        },
+        "seccion_lab": {
+            "A": {
+                "id": 29,
+                "seccion": "A",
+                "id_curso": 1705276,
+                "id_docente": 7923,
+                "aula": "Lab 04",
+                "lista_horas": [
+                    { "dia_orden": 2, "hora_orden": 14 },
+                    { "dia_orden": 2, "hora_orden": 15 }
+                ]
+            },
+            "B": {
+                "id": 30,
+                "seccion": "B",
+                "id_curso": 1705276,
+                "id_docente": 7540,
+                "aula": "Lab 04",
+                "lista_horas": [
+                    { "dia_orden": 1, "hora_orden": 1 },
+                    { "dia_orden": 1, "hora_orden": 2 }
+                ]
+            },
+            "C": {
+                "id": 32,
+                "seccion": "C",
+                "id_curso": 1705276,
+                "id_docente": 7923,
+                "aula": "Lab 04",
+                "lista_horas": [
+                    { "dia_orden": 2, "hora_orden": 1 },
+                    { "dia_orden": 2, "hora_orden": 2 }
+                ]
+            }
+        }
+    },
+    {
+        "id": 1705279,
+        "año_academico": "Quinto año",
+        "nombre": "TRABAJO DE INVESTIGACIÓN",
+        "SIGLAS": "TI",
+        "color": "#f43f5e",
+        "valido": false,
+        "horas_teo": 6,
+        "horas_lab": 0,
+        "seccion_teo": {
+            "A": {
+                "id": 33,
+                "seccion": "A",
+                "id_curso": 1705279,
+                "id_docente": 4396,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 1, "hora_orden": 1 },
+                    { "dia_orden": 1, "hora_orden": 2 },
+                    { "dia_orden": 1, "hora_orden": 3 },
+                    { "dia_orden": 3, "hora_orden": 1 },
+                    { "dia_orden": 3, "hora_orden": 2 },
+                    { "dia_orden": 3, "hora_orden": 3 }
+                ]
+            },
+            "B": {
+                "id": 34,
+                "seccion": "B",
+                "id_curso": 1705279,
+                "id_docente": 4850,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 2, "hora_orden": 13 },
+                    { "dia_orden": 2, "hora_orden": 14 },
+                    { "dia_orden": 2, "hora_orden": 15 },
+                    { "dia_orden": 3, "hora_orden": 13 },
+                    { "dia_orden": 3, "hora_orden": 14 },
+                    { "dia_orden": 3, "hora_orden": 15 }
+                ]
+            },
+            "C": {
+                "id": 35,
+                "seccion": "C",
+                "id_curso": 1705279,
+                "id_docente": 1855,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 4, "hora_orden": 1 },
+                    { "dia_orden": 4, "hora_orden": 2 },
+                    { "dia_orden": 4, "hora_orden": 3 },
+                    { "dia_orden": 5, "hora_orden": 1 },
+                    { "dia_orden": 5, "hora_orden": 2 },
+                    { "dia_orden": 5, "hora_orden": 3 }
+                ]
+            },
+            "D": {
+                "id": 36,
+                "seccion": "D",
+                "id_curso": 1705279,
+                "id_docente": 30,
+                "aula": "Aula 301",
+                "lista_horas": [
+                    { "dia_orden": 1, "hora_orden": 1 },
+                    { "dia_orden": 1, "hora_orden": 2 },
+                    { "dia_orden": 1, "hora_orden": 3 },
+                    { "dia_orden": 5, "hora_orden": 1 },
+                    { "dia_orden": 5, "hora_orden": 2 },
+                    { "dia_orden": 5, "hora_orden": 3 }
+                ]
+            },
+            "E": {
+                "id": 37,
+                "seccion": "E",
+                "id_curso": 1705279,
+                "id_docente": 3750,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 1, "hora_orden": 6 },
+                    { "dia_orden": 1, "hora_orden": 7 },
+                    { "dia_orden": 1, "hora_orden": 8 },
+                    { "dia_orden": 3, "hora_orden": 6 },
+                    { "dia_orden": 3, "hora_orden": 7 },
+                    { "dia_orden": 3, "hora_orden": 8 }
+                ]
+            },
+            "F": {
+                "id": 38,
+                "seccion": "F",
+                "id_curso": 1705279,
+                "id_docente": 30,
+                "aula": "Aula 301",
+                "lista_horas": [
+                    { "dia_orden": 4, "hora_orden": 10 },
+                    { "dia_orden": 4, "hora_orden": 11 },
+                    { "dia_orden": 4, "hora_orden": 12 },
+                    { "dia_orden": 5, "hora_orden": 10 },
+                    { "dia_orden": 5, "hora_orden": 11 },
+                    { "dia_orden": 5, "hora_orden": 12 }
+                ]
+            },
+            "G": {
+                "id": 39,
+                "seccion": "G",
+                "id_curso": 1705279,
+                "id_docente": 3889,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 4, "hora_orden": 10 },
+                    { "dia_orden": 4, "hora_orden": 11 },
+                    { "dia_orden": 4, "hora_orden": 12 },
+                    { "dia_orden": 5, "hora_orden": 10 },
+                    { "dia_orden": 5, "hora_orden": 11 },
+                    { "dia_orden": 5, "hora_orden": 12 }
+                ]
+            },
+            "H": {
+                "id": 40,
+                "seccion": "H",
+                "id_curso": 1705279,
+                "id_docente": 3889,
+                "aula": "Aula 205",
+                "lista_horas": [
+                    { "dia_orden": 4, "hora_orden": 13 },
+                    { "dia_orden": 4, "hora_orden": 14 },
+                    { "dia_orden": 4, "hora_orden": 15 },
+                    { "dia_orden": 5, "hora_orden": 13 },
+                    { "dia_orden": 5, "hora_orden": 14 },
+                    { "dia_orden": 5, "hora_orden": 15 }
+                ]
+            }
+        },
+        "seccion_lab": { }
+    }
+]
